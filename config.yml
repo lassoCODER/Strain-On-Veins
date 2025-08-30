@@ -14,7 +14,7 @@ engines:
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
       Move Overhead: 250                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 1.0                           # Max time per move in seconds.
+      time: 0.7                           # Max time per move in seconds.
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
   variants:                               # Engine used for variants when no suitable special engine is configured.
@@ -83,7 +83,7 @@ gaviota:
 
 opening_books:
   enabled: true 
-  priority: 400
+  priority: 10000
   books:
     standard_white:
       selection: weighted_random
@@ -181,9 +181,9 @@ online_moves:
 
 offer_draw:
   enabled: true                           # Activate whether the bot should offer draw.
-  score: 10                               # If the absolute value of the score is less than or equal to this value, the bot offers/accepts draw (in cp)
-  consecutive_moves: 5                    # How many moves in a row the absolute value of the score has to be below the draw value
-  min_game_length: 25                     # Earliest move in which draw is offered.
+  score: 50                               # If the absolute value of the score is less than or equal to this value, the bot offers/accepts draw (in cp)
+  consecutive_moves: 3                    # How many moves in a row the absolute value of the score has to be below the draw value
+  min_game_length: 20                     # Earliest move in which draw is offered.
   against_humans: false                    # Activate whether these settings should apply against humans.
 
 resign:
