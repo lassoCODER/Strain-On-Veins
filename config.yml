@@ -101,12 +101,14 @@ opening_books:
       names:
 #        - DefaultBook
         - fast
+        - fastest
         - BackupBook
 
     standard_black_tournament:
       selection: best_move
       names:
         - BlackBook
+        - fastest
 
     chess960_white:
       selection: best_move
