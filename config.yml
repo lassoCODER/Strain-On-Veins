@@ -99,16 +99,15 @@ opening_books:
     standard_white_tournament:
       selection: best_move
       names:
-#        - DefaultBook
-        - fast
-        - fastest
+        - strongest
+        - DefaultBook
         - BackupBook
 
     standard_black_tournament:
       selection: best_move
       names:
+        - strongest
         - BlackBook
-        - fastest
 
     chess960_white:
       selection: best_move
@@ -278,3 +277,4 @@ books:                                    # Names of the opening books (to be us
   Chess960: "./engines/chess960.bin"
   Anti: "./engines/anti_book.bin"
   crazy: "./engines/crazyhouse_book.bin"
+  strongest: "./engines/tournament.bin"
