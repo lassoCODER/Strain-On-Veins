@@ -99,7 +99,8 @@ opening_books:
     standard_white_tournament:
       selection: best_move
       names:
-        - DefaultBook
+#        - DefaultBook
+        - fast
         - BackupBook
 
     standard_black_tournament:
@@ -182,7 +183,7 @@ online_moves:
 offer_draw:
   enabled: true                           # Activate whether the bot should offer draw.
   score: 50                               # If the absolute value of the score is less than or equal to this value, the bot offers/accepts draw (in cp)
-  consecutive_moves: 3                    # How many moves in a row the absolute value of the score has to be below the draw value
+  consecutive_moves: 2                    # How many moves in a row the absolute value of the score has to be below the draw value
   min_game_length: 20                     # Earliest move in which draw is offered.
   against_humans: false                    # Activate whether these settings should apply against humans.
 
