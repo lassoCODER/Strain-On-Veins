@@ -14,7 +14,7 @@ engines:
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
       Move Overhead: 250                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 0.7                           # Max time per move in seconds.
+      time: 1.2                           # Max time per move in seconds.
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
   variants:                               # Engine used for variants when no suitable special engine is configured.
