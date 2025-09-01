@@ -100,7 +100,6 @@ opening_books:
       selection: best_move
       names:
         - loser               #book for long games    
-        - strongest           #book for draws but long
         - DefaultBook
         - BackupBook
 
@@ -108,7 +107,6 @@ opening_books:
       selection: best_move
       names:
         - loser               #book for long games    
-        - strongest           #book for draws but long
         - BlackBook
 
     chess960_white:
