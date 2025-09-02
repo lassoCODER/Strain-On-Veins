@@ -297,8 +297,8 @@ class Lichess_Game:
             for entry in entries:
                 #if not self._is_repetition(entry.move):
                     #break
-            else:
-                continue
+            #else:
+                #continue
 
             weight = entry.weight / sum(entry.weight for entry in entries) * 100.0
             learn = entry.learn if self.config.opening_books.read_learn else 0
