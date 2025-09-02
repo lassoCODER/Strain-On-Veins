@@ -295,10 +295,7 @@ class Lichess_Game:
                     entries.sort(key=lambda entry: entry.weight, reverse=True)
 
             for entry in entries:
-                #if not self._is_repetition(entry.move):
-                    #break
-            #else:
-                #continue
+                pass  
 
             weight = entry.weight / sum(entry.weight for entry in entries) * 100.0
             learn = entry.learn if self.config.opening_books.read_learn else 0
