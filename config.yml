@@ -107,6 +107,8 @@ opening_books:
       selection: best_move
       names:
         - loser               #book for long games    
+        - DefaultBook
+        - BackupBook
         - BlackBook
 
     chess960_white:
