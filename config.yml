@@ -14,7 +14,7 @@ engines:
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
       Move Overhead: 300                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 1.0                           # Max time per move in seconds.
+      time: 0.5                           # Max time per move in seconds.
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
   variants:                               # Engine used for variants when no suitable special engine is configured.
@@ -103,9 +103,7 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - slowdraw            #fast draw
         - rbone
-        - rbtwo
         - DefaultBook
         - BackupBook
 
@@ -114,9 +112,7 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - slowdraw            #fast draw
         - rbone
-        - rbtwo
         - DefaultBook
         - BackupBook
         - BlackBook
@@ -291,6 +287,4 @@ books:                                    # Names of the opening books (to be us
   crazy: "./engines/crazyhouse_book.bin"
   strongest: "./engines/tournament.bin"
   loser: "./engines/main.bin"
-  slowdraw: "./engines/slowdraw.bin"
   rbone: "./engines/rbone.bin"
-  rbtwo: "./engines/rbtwo.bin"
