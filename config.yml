@@ -285,3 +285,4 @@ books:                                    # Names of the opening books (to be us
   crazy: "./engines/crazyhouse_book.bin"
   strongest: "./engines/tournament.bin"
   loser: "./engines/main.bin"
+  slowdraw: "./engines/slowdraw.bin"
