@@ -88,17 +88,20 @@ opening_books:
     standard_white:
       selection: weighted_random
       names:
-        - Optimus2502
-        - Optimus4
+        - slowdraw
+ #       - Optimus2502
+ #       - Optimus4
 
     standard_black:
       selection: best_move
       names:
-        - BlackBook
+        - slowdraw
+#        - BlackBook
 
     standard_white_tournament:
       selection: best_move
       names:
+        - slowdraw
         - loser               #book for long games    
         - DefaultBook
         - BackupBook
@@ -106,6 +109,7 @@ opening_books:
     standard_black_tournament:
       selection: best_move
       names:
+        - slowdraw
         - loser               #book for long games    
         - DefaultBook
         - BackupBook
