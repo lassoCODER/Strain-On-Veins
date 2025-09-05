@@ -103,6 +103,7 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
+        - slowdraw
         - DefaultBook
         - BackupBook
 
@@ -111,6 +112,7 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
+        - slowdraw
         - DefaultBook
         - BackupBook
         - BlackBook
