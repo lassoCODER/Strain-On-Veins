@@ -103,7 +103,9 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - slowdraw
+        - slowdraw            #fast draw
+        - rbone
+        - rbtwo
         - DefaultBook
         - BackupBook
 
@@ -112,7 +114,9 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - slowdraw
+        - slowdraw            #fast draw
+        - rbone
+        - rbtwo
         - DefaultBook
         - BackupBook
         - BlackBook
@@ -288,3 +292,5 @@ books:                                    # Names of the opening books (to be us
   strongest: "./engines/tournament.bin"
   loser: "./engines/main.bin"
   slowdraw: "./engines/slowdraw.bin"
+  rbone: "./engines/rbone.bin"
+  rbtwo: "./engines/rbtwo.bin"
