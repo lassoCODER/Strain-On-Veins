@@ -103,7 +103,6 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - rbone
         - DefaultBook
         - BackupBook
 
@@ -112,7 +111,7 @@ opening_books:
       names:
         - slowdraw
         - loser               #book for long games    
-        - rbone
+        - rbupdated
         - DefaultBook
         - BackupBook
         - BlackBook
@@ -287,4 +286,5 @@ books:                                    # Names of the opening books (to be us
   crazy: "./engines/crazyhouse_book.bin"
   strongest: "./engines/tournament.bin"
   loser: "./engines/main.bin"
-  rbone: "./engines/rbone.bin"
+  rbupdated: "./engines/rbupdated.bin"
+  rbsmall: "./engines/rbsmall.bin"

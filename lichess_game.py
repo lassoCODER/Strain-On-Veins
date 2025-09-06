@@ -321,11 +321,20 @@ class Lichess_Game:
 
     def _get_book_key(self) -> str | None:
         suffixes: list[str] = []
+
         if self.game_info.white_title != 'BOT' or self.game_info.black_title != 'BOT':
             suffixes.append('human')
+
         if self.game_info.tournament_id is not None:
             suffixes.append('tournament')
+
         suffixes.append('white' if self.is_white else 'black')
+
+        opponent_name = (
+            self.game_info.white_name if not self.is_white
+            else self.game_info.black_name
+        ).lower()
+        suffixes.append(opponent_name)
 
         def check_book_key(base_name: str) -> str | None:
             for i in range(len(suffixes), -1, -1):
@@ -338,18 +347,17 @@ class Lichess_Game:
             for alias in map(str.lower, self.board.aliases):
                 if key := check_book_key(alias):
                     return key
-
-            return
+            return None
 
         if self.board.chess960:
             if key := check_book_key('chess960'):
                 return key
-
         else:
             if key := check_book_key(self.game_info.speed):
                 return key
 
         return check_book_key('standard')
+
 
     async def _make_opening_explorer_move(self) -> Move_Response | None:
         out_of_book = self.out_of_opening_explorer_counter >= 5
