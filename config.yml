@@ -96,32 +96,32 @@ opening_books:
       names:
         - BlackBook
 
-    standard_white_nnue_drift:
+    standard_white_tournament_nnue_drift:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_nnue_drift:
+    standard_black_tournament_nnue_drift:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_yuki_1324:
+    standard_white_tournament_yuki_1324:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_yuki_1324:
+    standard_black_tournament_yuki_1324:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_maggichess16:
+    standard_white_tournament_maggichess16:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_maggichess16:
+    standard_black_tournament_maggichess16:
         selection: best_move
         names:
         - rbsmall
