@@ -96,52 +96,52 @@ opening_books:
       names:
         - BlackBook
 
-    standard_white_strain-on-veins:
+    standard_white_tournament_strain-on-veins:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_strain-on-veins:
+    standard_black_tournament_strain-on-veins:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_yuki_1324:
+    standard_white_tournament_yuki_1324:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_yuki_1324:
+    standard_black_tournament_yuki_1324:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_maggichess16:
+    standard_white_tournament_maggichess16:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_maggichess16:
+    standard_black_tournament_maggichess16:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_endogenetic-bot:
+    standard_white_tournament_endogenetic-bot:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_endogenetic-bot:
+    standard_black_tournament_endogenetic-bot:
         selection: best_move
         names:
         - rbsmall
 
-    standard_white_exogenetic-bot:
+    standard_white_tournament_exogenetic-bot:
         selection: best_move
         names:
         - rbsmall
 
-    standard_black_exogenetic-bot:
+    standard_black_tournament_exogenetic-bot:
         selection: best_move
         names:
         - rbsmall
