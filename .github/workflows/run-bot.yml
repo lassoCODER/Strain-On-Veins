@@ -3,7 +3,8 @@ name: Run Bot
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */5 * * *'  
+    - cron: '0 */5 * * *'
+
 
 jobs:
   run-bot:
@@ -25,9 +26,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh
-
       - name: Install Requirements
         run: |
           pip install -r requirements.txt
@@ -48,18 +46,5 @@ jobs:
       - name: Run Bot
         run: |
           echo "Starting bot..."
-          python3 -u user_interface.py "matchmaking" &
-          PID=$!
+          python3 -u user_interface.py "matchmaking" 
           
-          # Auto-exit after 350 minutes (so restart runs without overlap)
-          ( sleep 20700 && echo "Time up. Killing bot..." && kill -SIGTERM $PID ) &
-          
-          wait $PID
-          echo "Bot ended cleanly."
-
-
-      - name: Self-Restart (Fire-and-Forget)
-        if: always()
-        run: gh workflow run run-bot.yml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
