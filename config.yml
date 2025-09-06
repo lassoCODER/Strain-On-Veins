@@ -88,20 +88,48 @@ opening_books:
     standard_white:
       selection: weighted_random
       names:
-        - slowdraw
- #       - Optimus2502
- #       - Optimus4
+        - Optimus2502
+        - Optimus4
 
     standard_black:
       selection: best_move
       names:
-        - slowdraw
-#        - BlackBook
+        - BlackBook
+
+    standard_white_nnue_drift:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_nnue_drift:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_white_yuki_1324:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_yuki_1324:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_white_maggichess16:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_maggichess16:
+        selection: best_move
+        names:
+        - rbsmall
+        
 
     standard_white_tournament:
       selection: best_move
       names:
-        - slowdraw
         - loser               #book for long games    
         - DefaultBook
         - BackupBook
@@ -109,7 +137,6 @@ opening_books:
     standard_black_tournament:
       selection: best_move
       names:
-        - slowdraw
         - loser               #book for long games    
         - rbupdated
         - DefaultBook
