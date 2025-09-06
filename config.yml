@@ -125,6 +125,26 @@ opening_books:
         selection: best_move
         names:
         - rbsmall
+
+    standard_white_endogenetic-bot:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_endogenetic-bot:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_white_exogenetic-bot:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_exogenetic-bot:
+        selection: best_move
+        names:
+        - rbsmall
         
 
     standard_white_tournament:
