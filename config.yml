@@ -90,19 +90,47 @@ opening_books:
       names:
         - Optimus2502
         - Optimus4
-        - slowdraw
 
     standard_black:
       selection: best_move
       names:
         - BlackBook
-        - slowdraw
+
+    standard_whit_strain-on-veins:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_strain-on-veins:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_white_yuki_1324:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_yuki_1324:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_white_maggichess16:
+        selection: best_move
+        names:
+        - rbsmall
+
+    standard_black_maggichess16:
+        selection: best_move
+        names:
+        - rbsmall
+        
 
     standard_white_tournament:
       selection: best_move
       names:
         - loser               #book for long games    
-        - rbone
         - DefaultBook
         - BackupBook
 
@@ -110,7 +138,7 @@ opening_books:
       selection: best_move
       names:
         - loser               #book for long games    
-        - rbone
+        - rbupdated
         - DefaultBook
         - BackupBook
         - BlackBook
@@ -317,4 +345,5 @@ books:                                    # Names of the opening books (to be us
   whitekingofhill: "./engines/whitekingofhill.bin"
   blackkingofhill: "./engines/blackkingofhill.bin"
   loser: "./engines/main.bin"
-  rbone: "./engines/rbone.bin"
+  rbupdated: "./engines/rbupdated.bin"
+  rbsmall: "./engines/rbsmall.bin"
