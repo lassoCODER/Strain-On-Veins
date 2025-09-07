@@ -148,20 +148,15 @@ opening_books:
       names:
         - Chess960    
 
-    chess960_black:
-      selection: best_move
-      names:
-        - Chess960
-
     antichess_white:
       selection: best_move
       names:
-        - Anti
+        - whiteanti
 
     antichess_black:
       selection: best_move
       names:
-        - Anti
+        - blackanti
 
     crazyhouse_white:
       selection: best_move
