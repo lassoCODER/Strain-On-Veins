@@ -143,7 +143,7 @@ opening_books:
         - BackupBook
         - BlackBook
 
-    chess960_white:
+    chess960:
       selection: best_move
       names:
         - Chess960    
@@ -167,6 +167,44 @@ opening_books:
       selection: best_move
       names:
         - crazy
+
+    horde_white:
+      selection: best_move
+      names:
+        - horde
+
+    horde_black:
+      selection: best_move
+      names:
+        - horde
+
+    atomic_white:
+      selection: best_move
+      names:
+        - whiteatomic
+
+    atomic_black:
+      selection: best_move
+      names:
+        - blackatomic
+
+    kingofthehill_black:
+      selection: best_move
+      names:
+        - blackkingofhill
+    kingofthehill_white:
+      selection: best_move
+      names:
+        - whitekingofhill
+
+    threecheck_black:
+      selection: best_move
+      names:
+        - threecheckwhite
+    threecheck_white:
+      selection: best_move
+      names:
+        - threecheckblack
 
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
@@ -304,9 +342,16 @@ books:                                    # Names of the opening books (to be us
   Optimus2502: "./engines/OPTIMUS2502.bin"
   Optimus4: "./engines/OPTIMUS4.bin"
   Chess960: "./engines/chess960.bin"
-  Anti: "./engines/anti_book.bin"
-  crazy: "./engines/crazyhouse_book.bin"
-  strongest: "./engines/tournament.bin"
+  whiteanti: "./engines/whiteanti.bin"
+  blackanti: "./engines/blackanti.bin"
+  crazy: "./engines/crazyhouse.bin"
+  horde: "./engines/horde.bin"
+  whiteatomic: "./engines/whiteatomic.bin"
+  blackatomic: "./engines/blackatomic.bin"
+  whitekingofhill: "./engines/whitekingofhill.bin"
+  blackkingofhill: "./engines/blackkingofhill.bin"
+  threecheckwhite: "./engines/white3check.bin"
+  threecheckblack: "./engines/black3check.bin"
   loser: "./engines/main.bin"
   rbupdated: "./engines/rbupdated.bin"
   rbsmall: "./engines/rbsmall.bin"
