@@ -187,7 +187,7 @@ opening_books:
     crazyhouse_black:
       selection: best_move
       names:
-        - crazy
+        - crazywhite
 
     horde_white:
       selection: best_move
@@ -364,7 +364,7 @@ books:                                    # Names of the opening books (to be us
   Chess960: "./engines/chess960.bin"
   whiteanti: "./engines/whiteanti.bin"
   blackanti: "./engines/blackanti.bin"
-  crazy: "./engines/crazyhouse.bin"
+#  crazy: "./engines/crazyhouse.bin"
   crazywhite: "./engines/crazyhouse_book.bin"
   horde: "./engines/horde.bin"
   whiteatomic: "./engines/whiteatomic.bin"
