@@ -8,10 +8,10 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-BOTS = ["NimsiluBot", "VariantsBot"]
+BOTS = ["ToromBot", "DarkOnBot", "NecroMindX", "PINEAPPLEMASK", "Roudypuff"]
 
-VARIANT = "atomic"
-MIN_ELO = 2550
+VARIANT = "crazyhouse"
+MIN_ELO = 2100
 CHUNK_SIZE = 5000
 REQUEST_TIMEOUT = 120
 SLEEP_BETWEEN_CHUNKS = 0.4
@@ -212,7 +212,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         except Exception:
             pass
 
-        board = chess.variant.AtomicBoard()
+        board = chess.variant.CrazyhouseBoard()
         result = game.headers.get("Result", "*")
 
         for ply, move in enumerate(game.mainline_moves()):
