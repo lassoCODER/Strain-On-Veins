@@ -164,25 +164,20 @@ opening_books:
         - BlackBook
 
 
-    chess960_white:
+    chess960:
       selection: best_move
       names:
         - Chess960    
 
-    chess960_black:
-      selection: best_move
-      names:
-        - Chess960
-
     antichess_white:
       selection: best_move
       names:
-        - Anti
+        - whiteanti
 
     antichess_black:
       selection: best_move
       names:
-        - Anti
+        - blackanti
 
     crazyhouse_white:
       selection: best_move
@@ -207,12 +202,12 @@ opening_books:
     atomic_white:
       selection: best_move
       names:
-        - atomic
+        - whiteatomic
 
     atomic_black:
       selection: best_move
       names:
-        - atomic
+        - blackatomic
 
     kingofthehill_black:
       selection: best_move
@@ -222,6 +217,15 @@ opening_books:
       selection: best_move
       names:
         - whitekingofhill
+
+    threecheck_black:
+      selection: best_move
+      names:
+        - threecheckwhite
+    threecheck_white:
+      selection: best_move
+      names:
+        - threecheckblack
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
 
@@ -358,12 +362,16 @@ books:                                    # Names of the opening books (to be us
   Optimus2502: "./engines/OPTIMUS2502.bin"
   Optimus4: "./engines/OPTIMUS4.bin"
   Chess960: "./engines/chess960.bin"
-  Anti: "./engines/anti_book.bin"
-  crazy: "./engines/crazyhouse_book.bin"
-  horde: "./engines/horde_book.bin"
-  atomic: "./engines/atomic_book.bin"
+  whiteanti: "./engines/whiteanti.bin"
+  blackanti: "./engines/blackanti.bin"
+  crazy: "./engines/crazyhouse.bin"
+  horde: "./engines/horde.bin"
+  whiteatomic: "./engines/whiteatomic.bin"
+  blackatomic: "./engines/blackatomic.bin"
   whitekingofhill: "./engines/whitekingofhill.bin"
   blackkingofhill: "./engines/blackkingofhill.bin"
+  threecheckwhite: "./engines/white3check.bin"
+  threecheckblack: "./engines/black3check.bin"
   loser: "./engines/main.bin"
   rbupdated: "./engines/rbupdated.bin"
   rbsmall: "./engines/rbsmall.bin"
