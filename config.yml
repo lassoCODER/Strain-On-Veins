@@ -29,7 +29,7 @@ engines:
       Move Overhead: 250                  # Increase if your bot flags games too often.
       EvalFile: "3check-cb5f517c228b.nnue:antichess-dd3cbe53cd4e.nnue:atomic-2cf13ff256cc.nnue:crazyhouse-8ebf84784ad2.nnue:horde-28173ddccabe.nnue:kingofthehill-978b86d0e6a4.nnue:racingkings-636b95f085e3.nnue"
     limits:                               # Limits that end the move calculation early.
- #     time: 5.0                           # Max time per move in seconds.
+      time: 5.0                           # Max time per move in seconds.
     
 #     depth: 26                           # Max depth per move.
 #     nodes: 4000000                      # Max nodes per move.
@@ -146,29 +146,13 @@ opening_books:
     chess960:
       selection: best_move
       names:
-        - Chess960    
-
-    antichess_white:
-      selection: best_move
-      names:
-        - whiteanti
-
-    antichess_black:
-      selection: best_move
-      names:
-        - blackanti
-
-    crazyhouse_white:
-      selection: best_move
-      names:
-        - crazy
+        - Chess960 
 
     crazyhouse_black:
       selection: best_move
       names:
-        - crazy
-
-    horde_white:
+        - crazyblack
+    crazyhouse_white:
       selection: best_move
       names:
         - horde
@@ -252,7 +236,7 @@ offer_draw:
   enabled: true                           # Activate whether the bot should offer draw.
   score: 50                               # If the absolute value of the score is less than or equal to this value, the bot offers/accepts draw (in cp)
   consecutive_moves: 2                    # How many moves in a row the absolute value of the score has to be below the draw value
-  min_game_length: 20                     # Earliest move in which draw is offered.
+  min_game_length: 31                     # Earliest move in which draw is offered.
   against_humans: false                    # Activate whether these settings should apply against humans.
 
 resign:
@@ -342,16 +326,8 @@ books:                                    # Names of the opening books (to be us
   Optimus2502: "./engines/OPTIMUS2502.bin"
   Optimus4: "./engines/OPTIMUS4.bin"
   Chess960: "./engines/chess960.bin"
-  whiteanti: "./engines/whiteanti.bin"
-  blackanti: "./engines/blackanti.bin"
-  crazy: "./engines/crazyhouse.bin"
-  horde: "./engines/horde.bin"
-  whiteatomic: "./engines/whiteatomic.bin"
-  blackatomic: "./engines/blackatomic.bin"
-  whitekingofhill: "./engines/whitekingofhill.bin"
-  blackkingofhill: "./engines/blackkingofhill.bin"
-  threecheckwhite: "./engines/white3check.bin"
-  threecheckblack: "./engines/black3check.bin"
+  crazywhite: "./engines/crazy_white.bin"
+  crazyblack: "./engines/crazy_black.bin"
   loser: "./engines/main.bin"
   rbupdated: "./engines/rbupdated.bin"
   rbsmall: "./engines/rbsmall.bin"
