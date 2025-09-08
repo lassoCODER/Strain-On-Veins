@@ -11,8 +11,8 @@ TOURNAMENT_ID = "rTIW46jz"
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
 
-PGN_OUTPUT = f"{VARIANT}_white_wins.pgn"
-BOOK_OUTPUT = f"{VARIANT}_white_wins_book.bin"
+PGN_OUTPUT = f"{VARIANT}.pgn"
+BOOK_OUTPUT = f"{VARIANT}.bin"
 
 ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "DarkOnBot", "Roudypuff"}
 
