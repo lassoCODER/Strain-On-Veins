@@ -46,5 +46,5 @@ jobs:
       - name: Run Bot
         run: |
           echo "Starting bot..."
-          python3 -u user_interface.py "tournament rTIW46jz" "tournament H2cgYCoM" "tournament cwCZD5Qd" "tournament cLCqUiHC" "tournament 5sx9Kyda" "tournament BAdj3ZMy" "tournament CydbQlns" "tournament FpXaQRIn" 
+          python3 -u user_interface.py "tournament HDQCs5oP" 
           
