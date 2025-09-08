@@ -19,5 +19,5 @@ jobs:
         with:
           name: book
           path: |
-            crazyhouse_tourney_games.pgn
-            crazyhouse_tourney_book.bin
+            crazyhouse.pgn
+            crazyhouse.bin
