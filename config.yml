@@ -155,40 +155,7 @@ opening_books:
     crazyhouse_white:
       selection: best_move
       names:
-        - horde
-
-    horde_black:
-      selection: best_move
-      names:
-        - horde
-
-    atomic_white:
-      selection: best_move
-      names:
-        - whiteatomic
-
-    atomic_black:
-      selection: best_move
-      names:
-        - blackatomic
-
-    kingofthehill_black:
-      selection: best_move
-      names:
-        - blackkingofhill
-    kingofthehill_white:
-      selection: best_move
-      names:
-        - whitekingofhill
-
-    threecheck_black:
-      selection: best_move
-      names:
-        - threecheckwhite
-    threecheck_white:
-      selection: best_move
-      names:
-        - threecheckblack
+        - crazywhite
 
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
