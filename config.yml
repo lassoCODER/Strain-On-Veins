@@ -188,25 +188,7 @@ opening_books:
       selection: best_move
       names:
         - horde
-
-    atomic_white:
-      selection: best_move
-      names:
-        - whiteatomic
-
-    atomic_black:
-      selection: best_move
-      names:
-        - blackatomic
-
-    kingofthehill_black:
-      selection: best_move
-      names:
-        - blackkingofhill
-    kingofthehill_white:
-      selection: best_move
-      names:
-        - whitekingofhill
+        
 
     threecheck_black:
       selection: best_move
@@ -355,10 +337,6 @@ books:                                    # Names of the opening books (to be us
   whiteanti: "./engines/whiteanti.bin"
   blackanti: "./engines/blackanti.bin"
   horde: "./engines/horde.bin"
-  whiteatomic: "./engines/whiteatomic.bin"
-  blackatomic: "./engines/blackatomic.bin"
-  whitekingofhill: "./engines/whitekingofhill.bin"
-  blackkingofhill: "./engines/blackkingofhill.bin"
   threecheckwhite: "./engines/white3check.bin"
   threecheckblack: "./engines/black3check.bin"
   loser: "./engines/main.bin"
