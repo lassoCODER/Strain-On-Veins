@@ -41,7 +41,7 @@ jobs:
           mv engines/stockfish_* engines/stockfish
           chmod +x engines/stockfish
 
-      - name: Download latest Fairy-Stockfish (linux-x86-64-modern)
+      - name: download latest fsf
         run: |
           mkdir -p engines
 
@@ -60,8 +60,17 @@ jobs:
             -o fsf.zip "$ARTIFACT_URL"
 
           unzip -o fsf.zip -d engines/
-          mv engines/fairy-stockfish* engines/fairy-stockfish
+
+          # Pick the standard modern build, ignore largeboards
+          if [ -f engines/fairy-stockfish_x86-64-modern ]; then
+            mv engines/fairy-stockfish_x86-64-modern engines/fairy-stockfish
+          else
+            echo "Fairy-Stockfish modern binary not found!"
+            exit 1
+          fi
+
           chmod +x engines/fairy-stockfish
+
 
       - name: Run Bot
         run: |
