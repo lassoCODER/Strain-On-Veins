@@ -6,15 +6,15 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "crazyhouse"
-TOURNAMENT_ID = "rTIW46jz"
+VARIANT = "kingofthehill"
+TOURNAMENT_IDS = ["cwCZD5Qd", "3T48Bfcb"]
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
 
 PGN_OUTPUT = f"{VARIANT}.pgn"
-BOOK_OUTPUT = "crazy_black.bin"
+BOOK_OUTPUT = "koth_white.bin"
 
-ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "NecroMindX"}
+ALLOWED_BOTS = {"ToromBot", "Speedrunchessgames", "NecroMindX"}
 
 
 def fetch_tournament_pgn(tournament_id: str) -> str:
@@ -69,7 +69,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():
+                if "@" in m.uci():  # skip drops
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -90,7 +90,7 @@ def key_hex(board: chess.Board) -> str:
 
 
 def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book from BLACK wins...")
+    print("Building book from WHITE wins...")
     book = Book()
     with open(pgn_path, "r", encoding="utf-8") as f:
         data = f.read()
@@ -108,15 +108,15 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
             continue
 
         result = game.headers.get("Result", "")
-        black = game.headers.get("Black", "")
+        white = game.headers.get("White", "")
 
-        if result != "0-1":
-            continue  # only black wins
-        if black not in ALLOWED_BOTS:
-            continue  # only if black is one of your bots
+        if result != "1-0":
+            continue  # only white wins
+        if white not in ALLOWED_BOTS:
+            continue  # only allowed bots
 
         kept += 1
-        board = chess.variant.CrazyhouseBoard()
+        board = chess.variant.KingOfTheHillBoard()
 
         for ply, move in enumerate(game.mainline_moves()):
             if ply >= MAX_PLY:
@@ -129,11 +129,11 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
                 decay = max(1, (MAX_PLY - ply) // 5)
 
-                # Only give high weight to Black’s moves
-                if board.turn == chess.BLACK:
+                # Only give high weight to White’s moves
+                if board.turn == chess.WHITE:
                     bm.weight += 6 * decay
                 else:
-                    bm.weight += 1  # minimal weight for context
+                    bm.weight += 1  # minimal context
 
                 board.push(move)
             except Exception:
@@ -143,7 +143,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if processed % 100 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} black wins")
+    print(f"Parsed {processed} PGNs, kept {kept} white wins")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
@@ -153,12 +153,15 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
 
 def main():
-    pgn_text = fetch_tournament_pgn(TOURNAMENT_ID)
-    save_pgn(pgn_text, PGN_OUTPUT)
+    combined_pgn = ""
+    for tid in TOURNAMENT_IDS:
+        pgn_text = fetch_tournament_pgn(tid)
+        combined_pgn += pgn_text + "\n\n"
+
+    save_pgn(combined_pgn, PGN_OUTPUT)
     build_book_from_pgn(PGN_OUTPUT, BOOK_OUTPUT)
     print("Done.")
 
 
 if __name__ == "__main__":
     main()
-
