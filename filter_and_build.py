@@ -14,7 +14,7 @@ MAX_BOOK_WEIGHT = 2520
 PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = f"{VARIANT}.bin"
 
-ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "DarkOnBot", "Roudypuff"}
+ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "NecroMindX"}
 
 
 def fetch_tournament_pgn(tournament_id: str) -> str:
