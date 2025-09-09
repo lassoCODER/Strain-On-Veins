@@ -20,4 +20,4 @@ jobs:
           name: book
           path: |
             koth.pgn
-            koth_white.bin
+            koth_black.bin
