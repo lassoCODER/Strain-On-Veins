@@ -12,7 +12,7 @@ MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
 
 PGN_OUTPUT = f"{VARIANT}.pgn"
-BOOK_OUTPUT = "koth_white.bin"
+BOOK_OUTPUT = "koth_black.bin"
 
 ALLOWED_BOTS = {"ToromBot", "Speedrunchessgames", "NecroMindX"}
 
@@ -90,7 +90,7 @@ def key_hex(board: chess.Board) -> str:
 
 
 def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book from WHITE wins...")
+    print("Building book from BLACK wins + draws...")
     book = Book()
     with open(pgn_path, "r", encoding="utf-8") as f:
         data = f.read()
@@ -108,11 +108,11 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
             continue
 
         result = game.headers.get("Result", "")
-        white = game.headers.get("White", "")
+        black = game.headers.get("Black", "")
 
-        if result != "1-0":
-            continue  # only white wins
-        if white not in ALLOWED_BOTS:
+        if result not in ("0-1", "1/2-1/2"):
+            continue  # only black wins or draws
+        if black not in ALLOWED_BOTS:
             continue  # only allowed bots
 
         kept += 1
@@ -129,11 +129,11 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
                 decay = max(1, (MAX_PLY - ply) // 5)
 
-                # Only give high weight to White’s moves
-                if board.turn == chess.WHITE:
+                # Emphasize Black moves
+                if board.turn == chess.BLACK:
                     bm.weight += 6 * decay
                 else:
-                    bm.weight += 1  # minimal context
+                    bm.weight += 1  # minimal for context
 
                 board.push(move)
             except Exception:
@@ -143,7 +143,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if processed % 100 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} white wins")
+    print(f"Parsed {processed} PGNs, kept {kept} black wins/draws")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
