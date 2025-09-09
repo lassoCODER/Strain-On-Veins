@@ -18,7 +18,7 @@ MAX_BOOK_WEIGHT = 2520
 PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = f"{VARIANT}.bin"
 
-ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "DarkOnBot", "Roudypuff"}
+ALLOWED_BOTS = {"ToromBot", "PINEAPPLEMASK", "NecroMindX"}
 
 
 def fetch_tournament_pgn(tournament_id: str) -> str:
@@ -94,7 +94,7 @@ def key_hex(board: chess.Board) -> str:
 
 
 def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book from BLACK wins...")
+    print("Building book from WHITE wins...")
     book = Book()
     with open(pgn_path, "r", encoding="utf-8") as f:
         data = f.read()
@@ -124,7 +124,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
                 bm.move = move
 
                 decay = max(1, (MAX_PLY - ply) // 5)
-                bm.weight += 6 * decay  # boost black’s winning moves
+                bm.weight += 6 * decay  # boost white’s winning moves
 
                 board.push(move)
             except Exception:
@@ -134,7 +134,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if processed % 100 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} black wins")
+    print(f"Parsed {processed} PGNs, kept {kept} white wins")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
