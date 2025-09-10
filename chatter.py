@@ -289,6 +289,7 @@ class Chatter:
   
     def _get_command_explanation(self, command: str, room: str) -> str:  
         explanations = {  
+            'help': 'Shows all available commands which you can use.',
             'cpu': 'Shows information about the bot\'s CPU (processor, cores, threads, frequency).',  
             'draw': 'Explains the bot\'s draw offering/accepting policy based on evaluation and game length.',  
             'eval': 'Shows the current position evaluation from the chess engine.',  
