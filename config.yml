@@ -89,12 +89,14 @@ opening_books:
     standard_white:
       selection: weighted_random
       names:
+        - white
         - Optimus2502
         - Optimus4
 
     standard_black:
       selection: best_move
       names:
+        - black
         - BlackBook
 
     standard_white_tournament_strain-on-veins:
@@ -330,3 +332,5 @@ books:                                    # Names of the opening books (to be us
   loser: "./engines/main.bin"
   rbupdated: "./engines/rbupdated.bin"
   rbsmall: "./engines/rbsmall.bin"
+  black: "./engines/std_black.bin"
+  white: "./engines/std_white.bin"
