@@ -9,31 +9,33 @@ VARIANT = "standard"
 MAX_PLY = 100
 MAX_BOOK_WEIGHT = 2520
 
-PGN_OUTPUT = f"{VARIANT}.pgn"
-BOOK_OUTPUT = "std_white.bin"
-ALLOWED_BOTS = {"ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift", "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot", "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2", }  
-MIN_RATING = 3100
+BOOK_OUTPUT = "std_black.bin"
+
+ALLOWED_BOTS = {
+    "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
+    "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot",
+    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2",
+}
+RATING_CUTOFF = 3100
 
 
-def fetch_games(user: str, max_games: int = 500) -> str:
-    url = f"https://lichess.org/api/games/user/{user}"
-    headers = {"Accept": "application/x-chess-pgn"}
+def fetch_user_pgn(username: str) -> str:
+    url = f"https://lichess.org/api/games/user/{username}"
     params = {
-        "max": max_games,
-        "perfType": "classical,rapid,blitz,bullet",
+        "perfType": "classical,blitz,bullet,rapid",
+        "clocks": "false",
+        "evals": "false",
+        "opening": "false",
         "rated": "true",
-        "analysed": "false"
+        "pgnInJson": "false",
+        "analysed": "false",
+        "variant": VARIANT,
     }
-    print(f"Downloading PGN for {user}...")
+    headers = {"Accept": "application/x-chess-pgn"}
+    print(f"Downloading PGN for {username}...")
     resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
     return resp.text
-
-
-def save_pgn(text: str, out_path: str) -> None:
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(text)
-    print(f"Saved PGN to {out_path}")
 
 
 class BookMove:
@@ -73,7 +75,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():  # skip drops (not needed here but safe)
+                if "@" in m.uci():  # skip drops
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -93,12 +95,10 @@ def key_hex(board: chess.Board) -> str:
     return f"{chess.polyglot.zobrist_hash(board):016x}"
 
 
-def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book from WHITE wins + draws...")
+def build_book_from_pgn(pgn_data: str, bin_path: str):
+    print("Building book from BLACK wins + draws...")
     book = Book()
-    with open(pgn_path, "r", encoding="utf-8") as f:
-        data = f.read()
-    stream = io.StringIO(data)
+    stream = io.StringIO(pgn_data)
 
     processed = 0
     kept = 0
@@ -107,19 +107,15 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if game is None:
             break
 
-        variant_tag = (game.headers.get("Variant", "") or "").lower()
-        if VARIANT not in variant_tag:
-            continue
-
         result = game.headers.get("Result", "")
-        white = game.headers.get("White", "")
-        white_elo = int(game.headers.get("WhiteElo", "0"))
+        black = game.headers.get("Black", "")
+        brating = int(game.headers.get("BlackElo", "0"))
 
-        if result not in ("1-0", "1/2-1/2"):
-            continue  # only white wins or draws
-        if white not in ALLOWED_BOTS:
+        if result not in ("0-1", "1/2-1/2"):
+            continue  # only black wins or draws
+        if black not in ALLOWED_BOTS:
             continue
-        if white_elo < MIN_RATING:
+        if brating < RATING_CUTOFF:
             continue
 
         kept += 1
@@ -136,11 +132,10 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
                 decay = max(1, (MAX_PLY - ply) // 5)
 
-                # Emphasize White moves
-                if board.turn == chess.WHITE:
+                if board.turn == chess.BLACK:
                     bm.weight += 6 * decay
                 else:
-                    bm.weight += 1  # minimal for context
+                    bm.weight += 1
 
                 board.push(move)
             except Exception:
@@ -150,7 +145,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if processed % 100 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} white wins/draws")
+    print(f"Parsed {processed} PGNs, kept {kept} black wins/draws")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
@@ -161,12 +156,10 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
 def main():
     combined_pgn = ""
-    for bot in ALLOWED_BOTS:
-        pgn_text = fetch_games(bot, max_games=500)
-        combined_pgn += pgn_text + "\n\n"
+    for username in ALLOWED_BOTS:
+        combined_pgn += fetch_user_pgn(username) + "\n\n"
 
-    save_pgn(combined_pgn, PGN_OUTPUT)
-    build_book_from_pgn(PGN_OUTPUT, BOOK_OUTPUT)
+    build_book_from_pgn(combined_pgn, BOOK_OUTPUT)
     print("Done.")
 
 
