@@ -20,4 +20,4 @@ jobs:
           name: mystdbook
           path: |
             standard.pgn
-            std_white.bin
+            std_black.bin
