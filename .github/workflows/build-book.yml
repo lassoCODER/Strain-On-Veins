@@ -19,5 +19,4 @@ jobs:
         with:
           name: mystdbook
           path: |
-            standard.pgn
             std_black.bin
