@@ -299,8 +299,8 @@ class Chatter:
             'pv': 'Shows the principal variation (best line of play) from the current position.' if room != 'player' else None,  
             'ram': 'Displays the amount of system memory (RAM) available to the bot.',  
             'ping': 'Tests the network connection latency to Lichess servers.',  
-            'roast': 'Sends a humorous, light-hearted criticism of your play.',  
-            'destroy': 'Sends an entertaining boastful message about the bot\'s performance.',  
+            'roast': 'Sends a roast about your play.',  
+            'destroy': 'Sends a roast about your play - deadlier than the roast command.',  
             'quotes': 'Shares an inspirational chess quote from famous players.',  
             'quiet': 'Stops automatic evaluation printing (use after !printeval).'  
         }  
