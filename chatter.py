@@ -282,10 +282,8 @@ class Chatter:
         user_room_key = f"{chat_message.username}_{chat_message.room}"  
         room = self.pending_use_requests.pop(user_room_key)  
 
-        command = chat_message.text.lower().strip()
-        if not command.startswith('!'):
-            command = '!' + command
-
+        command = chat_message.text.lower().lstrip('!').strip()
+        command = '!' + command
         explanation = self._get_command_explanation(command, room)  
         await self.api.send_chat_message(self.game_info.id_, room, explanation)  
   
