@@ -10,20 +10,20 @@ from datetime import datetime, timedelta
 VARIANT = "standard"
 MAX_PLY = 100
 MAX_BOOK_WEIGHT = 2520
-
 BOOK_OUTPUT = "std_black.bin"
+PGN_FILE = "combined.pgn"
 
-ALLOWED_BOTS = {
+ALLOWED_BOTS = [
     "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
     "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot",
     "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2", "InvinxibleFlxsh", "LeelaMultiPoss",
-}
+]
 RATING_CUTOFF = 3100
 
-
+# -------------------- PGN Download --------------------
 def fetch_user_pgn(username: str) -> str:
     now = datetime.utcnow()
-    since = now - timedelta(days=120)
+    since = now - timedelta(days=120)  # last 4 months
     url = f"https://lichess.org/api/games/user/{username}"
     params = {
         "perfType": "classical,blitz,bullet,rapid",
@@ -31,7 +31,6 @@ def fetch_user_pgn(username: str) -> str:
         "evals": "false",
         "opening": "false",
         "rated": "true",
-        "pgnInJson": "false",
         "analysed": "false",
         "variant": VARIANT,
         "since": int(since.timestamp() * 1000),
@@ -43,12 +42,23 @@ def fetch_user_pgn(username: str) -> str:
     resp.raise_for_status()
     return resp.text
 
+def download_all_pgns():
+    combined_pgn = ""
+    for username in ALLOWED_BOTS:
+        try:
+            combined_pgn += fetch_user_pgn(username) + "\n\n"
+        except Exception as e:
+            print(f"Failed to fetch {username}: {e}")
+    with open(PGN_FILE, "w", encoding="utf-8") as f:
+        f.write(combined_pgn)
+    print(f"Saved combined PGNs to {PGN_FILE}")
+    return combined_pgn
 
+# -------------------- Book Classes --------------------
 class BookMove:
     def __init__(self):
         self.weight = 0
         self.move: chess.Move | None = None
-
 
 class BookPosition:
     def __init__(self):
@@ -56,7 +66,6 @@ class BookPosition:
 
     def get_move(self, uci: str) -> BookMove:
         return self.moves.setdefault(uci, BookMove())
-
 
 class Book:
     def __init__(self):
@@ -98,11 +107,10 @@ class Book:
             print(f"Book verified: size {size} bytes (valid Polyglot)")
         print(f"Saved {len(entries)} moves to book: {path}")
 
-
 def key_hex(board: chess.Board) -> str:
     return f"{chess.polyglot.zobrist_hash(board):016x}"
 
-
+# -------------------- Build Book --------------------
 def build_book_from_pgn(pgn_data: str, bin_path: str):
     print("Building book from BLACK wins + draws...")
     book = Book()
@@ -161,17 +169,11 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
             bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 3))
     book.save_polyglot(bin_path)
 
-
 def main():
-    combined_pgn = ""
-    for username in ALLOWED_BOTS:
-        try:
-            combined_pgn += fetch_user_pgn(username) + "\n\n"
-        except Exception as e:
-            print(f"Failed to fetch {username}: {e}")
+    combined_pgn = download_all_pgns()
+
     build_book_from_pgn(combined_pgn, BOOK_OUTPUT)
     print("Done.")
-
 
 if __name__ == "__main__":
     main()
