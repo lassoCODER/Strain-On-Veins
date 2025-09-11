@@ -7,9 +7,9 @@ import chess.polyglot
 import chess.variant
 
 VARIANT = "antichess"
-MAX_PLY = 60
+MAX_PLY = 30
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2700
+MIN_RATING = 2730
 
 PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = "antichess_book.bin"
