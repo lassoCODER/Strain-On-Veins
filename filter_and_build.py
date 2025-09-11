@@ -7,7 +7,7 @@ import chess.polyglot
 import chess.variant
 
 VARIANT = "antichess"
-MAX_PLY = 50
+MAX_PLY = 40
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2730
 
