@@ -14,18 +14,26 @@ REQUEST_TIMEOUT = 120
 SLEEP_BETWEEN_CHUNKS = 0.4
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
+MIN_RATING = 2700
 
 PGN_OUTPUT = f"{VARIANT}.pgn"
-BOOK_OUTPUT = "koth_black.bin"
+BOOK_OUTPUT = "antichess_book.bin"
 
-ALLOWED_BOTS = {"ToromBot", "Speedrunchessgames", "NecroMindX"}
+ALLOWED_BOTS = {"ToromBot", "NecroMindX", "TacticalBot", "DarkOnBot"}
 
 
-def fetch_tournament_pgn(tournament_id: str) -> str:
-    url = f"https://lichess.org/api/tournament/{tournament_id}/games"
+def fetch_bot_games(bot_name: str, max_games: int = 3000) -> str:
+    """Fetch recent antichess games of a bot from Lichess in PGN format."""
+    url = f"https://lichess.org/api/games/user/{bot_name}"
     headers = {"Accept": "application/x-chess-pgn"}
-    print(f"Downloading PGN for tournament {tournament_id}...")
-    resp = requests.get(url, headers=headers)
+    params = {
+        "max": max_games,
+        "moves": True,
+        "analysed": False,
+        "variant": "antichess"
+    }
+    print(f"Downloading up to {max_games} antichess games for {bot_name}...")
+    resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
     return resp.text
 
@@ -33,9 +41,10 @@ def fetch_tournament_pgn(tournament_id: str) -> str:
 def save_pgn(text: str, out_path: str) -> None:
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(text)
-    print(f"Saved PGN to {out_path}")
+    print(f"Saved combined PGN to {out_path}")
 
 
+# --- Book data structures ---
 class BookMove:
     def __init__(self):
         self.weight = 0
@@ -82,6 +91,7 @@ class Book:
                 wbytes = min(MAX_BOOK_WEIGHT, bm.weight).to_bytes(2, "big")
                 lbytes = (0).to_bytes(4, "big")
                 entries.append(zbytes + mbytes + wbytes + lbytes)
+
         entries.sort(key=lambda e: (e[:8], e[10:12]))
         with open(path, "wb") as f:
             for e in entries:
@@ -94,7 +104,7 @@ def key_hex(board: chess.Board) -> str:
 
 
 def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book from BLACK wins + draws...")
+    print("Building book for both colors with minimum rating filter...")
     book = Book()
     with open(pgn_path, "r", encoding="utf-8") as f:
         data = f.read()
@@ -102,6 +112,7 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
     processed = 0
     kept = 0
+
     while True:
         game = chess.pgn.read_game(stream)
         if game is None:
@@ -124,22 +135,17 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
                 bm.move = move
 
                 decay = max(1, (MAX_PLY - ply) // 5)
-
-                # Emphasize Black moves
-                if board.turn == chess.BLACK:
-                    bm.weight += 6 * decay
-                else:
-                    bm.weight += 1  # minimal for context
+                bm.weight += 3 * decay  # both sides weighted equally
 
                 board.push(move)
             except Exception:
                 break
 
         processed += 1
-        if processed % 100 == 0:
+        if processed % 50 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} black wins/draws")
+    print(f"Parsed {processed} PGNs, kept {kept} high-rated games from allowed bots")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
@@ -150,9 +156,8 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
 
 def main():
     combined_pgn = ""
-    for tid in TOURNAMENT_IDS:
-        pgn_text = fetch_tournament_pgn(tid)
-        combined_pgn += pgn_text + "\n\n"
+    for bot in ALLOWED_BOTS:
+        combined_pgn += fetch_bot_games(bot) + "\n\n"
 
     save_pgn(combined_pgn, PGN_OUTPUT)
     build_book_from_pgn(PGN_OUTPUT, BOOK_OUTPUT)
