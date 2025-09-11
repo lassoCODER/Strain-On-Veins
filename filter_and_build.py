@@ -17,7 +17,7 @@ BOOK_OUTPUT = "antichess_book.bin"
 ALLOWED_BOTS = {"ToromBot", "NecroMindX", "TacticalBot", "DarkOnBot"}
 
 
-def fetch_bot_games(bot_name: str, max_games: int = 200) -> str:
+def fetch_bot_games(bot_name: str, max_games: int = 3000) -> str:
     """Fetch recent antichess games of a bot from Lichess in PGN format."""
     url = f"https://lichess.org/api/games/user/{bot_name}"
     headers = {"Accept": "application/x-chess-pgn"}
