@@ -18,13 +18,13 @@ jobs:
       - name: Install deps
         run: pip install chess requests
 
-      - name: Run fetch_and_build.py
-        run: python koth.py
+      - name: Run filter_and_build.py
+        run: python filter_and_build.py
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: book-artifacts
           path: |
-            kingOfTheHill_games.pgn
-            kingOfTheHill_book.bin
+            antichess.pgn
+            antichess_book.bin
