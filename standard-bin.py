@@ -6,7 +6,7 @@ import chess.pgn
 import chess.polyglot
 
 VARIANT = "standard"
-MAX_PLY = 100
+MAX_PLY = 150
 MAX_BOOK_WEIGHT = 2520
 
 BOOK_OUTPUT = "std_black.bin"
@@ -14,7 +14,7 @@ BOOK_OUTPUT = "std_black.bin"
 ALLOWED_BOTS = {
     "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
     "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot",
-    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2", "InvinxibleFlxsh", "LeelaMultiPoss",
+    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2",
 }
 RATING_CUTOFF = 3100
 
@@ -108,14 +108,16 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
             break
 
         result = game.headers.get("Result", "")
+        white = game.headers.get("White", "")
         black = game.headers.get("Black", "")
+        wrating = int(game.headers.get("WhiteElo", "0"))
         brating = int(game.headers.get("BlackElo", "0"))
 
         if result not in ("0-1", "1/2-1/2"):
             continue
         if black not in ALLOWED_BOTS:
             continue
-        if brating < RATING_CUTOFF:
+        if wrating < RATING_CUTOFF or brating < RATING_CUTOFF:
             continue
 
         kept += 1
