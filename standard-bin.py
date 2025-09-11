@@ -9,7 +9,7 @@ VARIANT = "standard"
 MAX_PLY = 100
 MAX_BOOK_WEIGHT = 2520
 
-BOOK_OUTPUT = "std_white.bin"
+BOOK_OUTPUT = "std_black.bin"
 
 ALLOWED_BOTS = {
     "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
@@ -96,7 +96,7 @@ def key_hex(board: chess.Board) -> str:
 
 
 def build_book_from_pgn(pgn_data: str, bin_path: str):
-    print("Building book from WHITE wins + draws...")
+    print("Building book from BLACK wins + draws...")
     book = Book()
     stream = io.StringIO(pgn_data)
 
@@ -108,14 +108,14 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
             break
 
         result = game.headers.get("Result", "")
-        white = game.headers.get("White", "")
-        wrating = int(game.headers.get("WhiteElo", "0"))
+        black = game.headers.get("Black", "")
+        brating = int(game.headers.get("BlackElo", "0"))
 
-        if result not in ("1-0", "1/2-1/2"):
-            continue  # only white wins or draws
-        if white not in ALLOWED_BOTS:
+        if result not in ("0-1", "1/2-1/2"):  # ✅ only black wins & draws
             continue
-        if wrating < RATING_CUTOFF:
+        if black not in ALLOWED_BOTS:
+            continue
+        if brating < RATING_CUTOFF:
             continue
 
         kept += 1
@@ -132,8 +132,8 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
 
                 decay = max(1, (MAX_PLY - ply) // 5)
 
-                if board.turn == chess.WHITE:
-                    bm.weight += 6 * decay  # White's moves get extra weight
+                if board.turn == chess.BLACK:
+                    bm.weight += 6 * decay  # ✅ Black’s moves boosted
                 else:
                     bm.weight += 1
 
@@ -145,7 +145,7 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
         if processed % 100 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} white wins/draws")
+    print(f"Parsed {processed} PGNs, kept {kept} black wins/draws")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
