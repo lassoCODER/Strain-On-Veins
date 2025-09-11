@@ -26,5 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            antichess.pgn
             antichess_book.bin

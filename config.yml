@@ -278,4 +278,6 @@ books:                                    # Names of the opening books (to be us
   kothblack: "./engines/koth_black.bin"
 #  black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
-  anti: "./engines/antichess_book.bin"
+  antiw: "./engines/anti_white.bin"
+  antib: "./engines/anti_black.bin"
+
