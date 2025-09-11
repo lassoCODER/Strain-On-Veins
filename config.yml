@@ -96,6 +96,7 @@ opening_books:
     standard_black:
       selection: best_move
       names:
+        - black
         - BlackBook
         
     standard_white_tournament:
@@ -108,6 +109,7 @@ opening_books:
     standard_black_tournament:
       selection: best_move
       names:
+        - black
         - DefaultBook
         - BackupBook
         - BlackBook
