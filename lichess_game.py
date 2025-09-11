@@ -295,15 +295,15 @@ class Lichess_Game:
                 case 'best_move':
                     entries.sort(key=lambda entry: entry.weight, reverse=True)
 
-            for entry in entries:
-                pass  
+            entry = entries[0]
 
             weight = entry.weight / sum(entry.weight for entry in entries) * 100.0
             learn = entry.learn if self.config.opening_books.read_learn else 0
-            name = name if len(self.book_settings.readers) > 1 else ''
+            book_name = name if len(self.book_settings.readers) > 1 else ''
             public_message = f'Book:    {self._format_move(entry.move):14}'
-            private_message = f'{self._format_book_info(weight, learn)}     {name}'
+            private_message = f'{self._format_book_info(weight, learn)}     {book_name}'
             return Move_Response(entry.move, public_message, private_message=private_message)
+
 
     def _get_book_settings(self) -> Book_Settings:
         if not self.config.opening_books.enabled:
