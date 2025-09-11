@@ -98,70 +98,18 @@ opening_books:
       names:
         - black
         - BlackBook
-
-    standard_white_tournament_strain-on-veins:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_strain-on-veins:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_yuki_1324:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_yuki_1324:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_maggichess16:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_maggichess16:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_endogenetic-bot:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_endogenetic-bot:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_exogenetic-bot:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_exogenetic-bot:
-        selection: best_move
-        names:
-        - rbsmall
         
-
     standard_white_tournament:
       selection: best_move
       names:
-        - loser               #book for long games    
+        - white
         - DefaultBook
         - BackupBook
 
     standard_black_tournament:
       selection: best_move
       names:
-        - loser               #book for long games    
-        - rbupdated
+        - black
         - DefaultBook
         - BackupBook
         - BlackBook
@@ -329,8 +277,5 @@ books:                                    # Names of the opening books (to be us
   crazyblack: "./engines/crazy_black.bin"
   kothwhite: "./engines/koth_white.bin"
   kothblack: "./engines/koth_black.bin"
-  loser: "./engines/main.bin"
-  rbupdated: "./engines/rbupdated.bin"
-  rbsmall: "./engines/rbsmall.bin"
   black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
