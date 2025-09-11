@@ -141,7 +141,7 @@ opening_books:
     antichess_white:
       selection: best_move
       names:
-        - anti
+        - antiw
 
     antichess_black:
       selection: best_move
@@ -290,4 +290,5 @@ books:                                    # Names of the opening books (to be us
   black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
   anti: "./engines/antichess_book.bin"
+  antiw: "./engines/antiw.bin"
 
