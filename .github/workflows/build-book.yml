@@ -19,4 +19,4 @@ jobs:
         with:
           name: mystdbook
           path: |
-            std_white.bin
+            std_black.bin
