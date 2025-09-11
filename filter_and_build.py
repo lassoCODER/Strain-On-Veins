@@ -11,13 +11,11 @@ MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2730
 
-PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = "antichess_book.bin"
+TOURNAMENT_ID = "5sx9Kyda"
+ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot"}
 
-ALLOWED_BOTS = {"NecroMindX"}
 
-
-# --- Book data structures ---
 class BookMove:
     def __init__(self):
         self.weight = 0
@@ -55,7 +53,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():  # skip drops
+                if "@" in m.uci():
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -64,7 +62,6 @@ class Book:
                 wbytes = min(MAX_BOOK_WEIGHT, bm.weight).to_bytes(2, "big")
                 lbytes = (0).to_bytes(4, "big")
                 entries.append(zbytes + mbytes + wbytes + lbytes)
-
         entries.sort(key=lambda e: (e[:8], e[10:12]))
         with open(path, "wb") as f:
             for e in entries:
@@ -76,67 +73,46 @@ def key_hex(board: chess.Board) -> str:
     return f"{chess.polyglot.zobrist_hash(board):016x}"
 
 
-def fetch_bot_games(bot_name: str, max_games: int = 3000):
-    """Fetch recent antichess games of a bot from Lichess in PGN format."""
-    url = f"https://lichess.org/api/games/user/{bot_name}"
+def fetch_tournament_games(tour_id: str, max_games: int = 5000):
+    url = f"https://lichess.org/api/tournament/{tour_id}/games"
     headers = {"Accept": "application/x-chess-pgn"}
-    params = {
-        "max": max_games,
-        "moves": True,
-        "analysed": False,
-        "variant": "antichess"
-    }
-    print(f"Downloading up to {max_games} antichess games for {bot_name}...")
+    params = {"max": max_games, "moves": True, "analysed": False, "variant": VARIANT}
     resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
     return io.StringIO(resp.text)
 
 
-def build_book(bot_name: str, bin_path: str):
-    print(f"Building Antichess book for {bot_name} (rating ≥ {MIN_RATING})...")
+def build_book(bin_path: str):
     book = Book()
-    stream = fetch_bot_games(bot_name)
-
-    processed = 0
-    kept = 0
-
+    stream = fetch_tournament_games(TOURNAMENT_ID)
+    processed = kept = 0
     while True:
         game = chess.pgn.read_game(stream)
         if game is None:
             break
-
         variant_tag = (game.headers.get("Variant", "") or "").lower().replace(" ", "")
         if VARIANT not in variant_tag:
             continue
-
         white = game.headers.get("White", "")
         black = game.headers.get("Black", "")
-
-        if white not in ALLOWED_BOTS and black not in ALLOWED_BOTS:
+        if white not in ALLOWED_BOTS:
             continue
-
-        # Check ratings
         try:
             white_elo = int(game.headers.get("WhiteElo", 0))
             black_elo = int(game.headers.get("BlackElo", 0))
         except ValueError:
             continue
-
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
-
         kept += 1
         board = chess.variant.AntichessBoard()
-
-        # Determine the eventual winner
         result = game.headers.get("Result", "")
         if result == "1-0":
             winner = chess.WHITE
         elif result == "0-1":
             winner = chess.BLACK
         else:
-            winner = None  # draw
-
+            winner = None
         for ply, move in enumerate(game.mainline_moves()):
             if ply >= MAX_PLY:
                 break
@@ -145,7 +121,6 @@ def build_book(bot_name: str, bin_path: str):
                 pos = book.get_position(k)
                 bm = pos.get_move(move.uci())
                 bm.move = move
-
                 decay = max(1, (MAX_PLY - ply) // 5)
                 if winner is not None:
                     if board.turn == winner:
@@ -153,25 +128,20 @@ def build_book(bot_name: str, bin_path: str):
                     else:
                         bm.weight += 2 * decay
                 else:
-                    bm.weight += 3 * decay  # draw moves
-
+                    bm.weight += 3 * decay
                 board.push(move)
             except Exception:
                 break
-
         processed += 1
         if processed % 50 == 0:
             print(f"Processed {processed} games")
-
-    print(f"Parsed {processed} PGNs, kept {kept} high-rated games from {bot_name}")
+    print(f"Parsed {processed} PGNs, kept {kept} games")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
             bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 2))
-
     book.save_polyglot(bin_path)
-    print("Done.")
 
 
 if __name__ == "__main__":
-    build_book("NecroMindX", BOOK_OUTPUT)
+    build_book(BOOK_OUTPUT)
