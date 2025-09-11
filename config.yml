@@ -87,7 +87,7 @@ opening_books:
   priority: 10000
   books:
     standard_white:
-      selection: weighted_random
+      selection: best_move
       names:
         - white
         - Optimus2502
