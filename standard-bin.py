@@ -14,7 +14,7 @@ BOOK_OUTPUT = "std_black.bin"
 ALLOWED_BOTS = {
     "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
     "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot",
-    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2",
+    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2", "InvinxibleFlxsh", "LeelaMultiPoss",
 }
 RATING_CUTOFF = 3100
 
@@ -75,7 +75,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():  # skip drops
+                if "@" in m.uci():
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -111,7 +111,7 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
         black = game.headers.get("Black", "")
         brating = int(game.headers.get("BlackElo", "0"))
 
-        if result not in ("0-1", "1/2-1/2"):  # ✅ only black wins & draws
+        if result not in ("0-1", "1/2-1/2"):
             continue
         if black not in ALLOWED_BOTS:
             continue
@@ -133,7 +133,7 @@ def build_book_from_pgn(pgn_data: str, bin_path: str):
                 decay = max(1, (MAX_PLY - ply) // 5)
 
                 if board.turn == chess.BLACK:
-                    bm.weight += 6 * decay  # ✅ Black’s moves boosted
+                    bm.weight += 6 * decay
                 else:
                     bm.weight += 1
 
