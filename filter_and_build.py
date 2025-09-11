@@ -14,7 +14,7 @@ MIN_RATING = 2730
 PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = "antichess_book.bin"
 
-ALLOWED_BOTS = {"ToromBot", "NecroMindX", "TacticalBot", "DarkOnBot"}
+ALLOWED_BOTS = {"ToromBot", "NecroMindX"}
 
 
 def fetch_bot_games(bot_name: str, max_games: int = 3000) -> str:
