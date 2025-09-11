@@ -98,36 +98,6 @@ opening_books:
       names:
         - black
         - BlackBook
-
-    standard_white_tournament_nnue_drift:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_nnue_drift:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_yuki_1324:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_yuki_1324:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_white_tournament_maggichess16:
-        selection: best_move
-        names:
-        - rbsmall
-
-    standard_black_tournament_maggichess16:
-        selection: best_move
-        names:
-        - rbsmall
         
     standard_white_tournament:
       selection: best_move
@@ -144,6 +114,7 @@ opening_books:
         - BackupBook
         - BlackBook
 
+
     chess960:
       selection: best_move
       names:
@@ -157,6 +128,15 @@ opening_books:
       selection: best_move
       names:
         - crazywhite
+
+    kingofthehill_black:
+      selection: best_move
+      names:
+        - kothblack
+    kingofthehill_white:
+      selection: best_move
+      names:
+        - kothwhite
 
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
