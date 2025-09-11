@@ -7,36 +7,14 @@ import chess.polyglot
 import chess.variant
 
 VARIANT = "antichess"
-MAX_PLY = 30
+MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2730
 
 PGN_OUTPUT = f"{VARIANT}.pgn"
 BOOK_OUTPUT = "antichess_book.bin"
 
-ALLOWED_BOTS = {"ToromBot", "NecroMindX"}
-
-
-def fetch_bot_games(bot_name: str, max_games: int = 3000) -> str:
-    """Fetch recent antichess games of a bot from Lichess in PGN format."""
-    url = f"https://lichess.org/api/games/user/{bot_name}"
-    headers = {"Accept": "application/x-chess-pgn"}
-    params = {
-        "max": max_games,
-        "moves": True,
-        "analysed": False,
-        "variant": "antichess"
-    }
-    print(f"Downloading up to {max_games} antichess games for {bot_name}...")
-    resp = requests.get(url, headers=headers, params=params)
-    resp.raise_for_status()
-    return resp.text
-
-
-def save_pgn(text: str, out_path: str) -> None:
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(text)
-    print(f"Saved combined PGN to {out_path}")
+ALLOWED_BOTS = {"NecroMindX"}
 
 
 # --- Book data structures ---
@@ -98,12 +76,26 @@ def key_hex(board: chess.Board) -> str:
     return f"{chess.polyglot.zobrist_hash(board):016x}"
 
 
-def build_book_from_pgn(pgn_path: str, bin_path: str):
-    print("Building book for both colors with minimum rating filter...")
+def fetch_bot_games(bot_name: str, max_games: int = 3000):
+    """Fetch recent antichess games of a bot from Lichess in PGN format."""
+    url = f"https://lichess.org/api/games/user/{bot_name}"
+    headers = {"Accept": "application/x-chess-pgn"}
+    params = {
+        "max": max_games,
+        "moves": True,
+        "analysed": False,
+        "variant": "antichess"
+    }
+    print(f"Downloading up to {max_games} antichess games for {bot_name}...")
+    resp = requests.get(url, headers=headers, params=params)
+    resp.raise_for_status()
+    return io.StringIO(resp.text)
+
+
+def build_book(bot_name: str, bin_path: str):
+    print(f"Building Antichess book for {bot_name} (rating ≥ {MIN_RATING})...")
     book = Book()
-    with open(pgn_path, "r", encoding="utf-8") as f:
-        data = f.read()
-    stream = io.StringIO(data)
+    stream = fetch_bot_games(bot_name)
 
     processed = 0
     kept = 0
@@ -136,6 +128,15 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         kept += 1
         board = chess.variant.AntichessBoard()
 
+        # Determine the eventual winner
+        result = game.headers.get("Result", "")
+        if result == "1-0":
+            winner = chess.WHITE
+        elif result == "0-1":
+            winner = chess.BLACK
+        else:
+            winner = None  # draw
+
         for ply, move in enumerate(game.mainline_moves()):
             if ply >= MAX_PLY:
                 break
@@ -146,7 +147,13 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
                 bm.move = move
 
                 decay = max(1, (MAX_PLY - ply) // 5)
-                bm.weight += 3 * decay  # both sides weighted equally
+                if winner is not None:
+                    if board.turn == winner:
+                        bm.weight += 5 * decay
+                    else:
+                        bm.weight += 2 * decay
+                else:
+                    bm.weight += 3 * decay  # draw moves
 
                 board.push(move)
             except Exception:
@@ -156,24 +163,15 @@ def build_book_from_pgn(pgn_path: str, bin_path: str):
         if processed % 50 == 0:
             print(f"Processed {processed} games")
 
-    print(f"Parsed {processed} PGNs, kept {kept} high-rated games from allowed bots")
+    print(f"Parsed {processed} PGNs, kept {kept} high-rated games from {bot_name}")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
-            bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 3))
+            bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 2))
 
     book.save_polyglot(bin_path)
-
-
-def main():
-    combined_pgn = ""
-    for bot in ALLOWED_BOTS:
-        combined_pgn += fetch_bot_games(bot) + "\n\n"
-
-    save_pgn(combined_pgn, PGN_OUTPUT)
-    build_book_from_pgn(PGN_OUTPUT, BOOK_OUTPUT)
     print("Done.")
 
 
 if __name__ == "__main__":
-    main()
+    build_book("NecroMindX", BOOK_OUTPUT)
