@@ -14,7 +14,7 @@ BOOK_OUTPUT = "std_black.bin"
 ALLOWED_BOTS = {
     "ToromBot", "Speedrunchessgames", "NecroMindX", "MaggiChess16", "NNUE_Drift",
     "PINEAPPLEMASK", "Strain-On-Veins", "Yuki_1324", "Endogenetic-Bot",
-    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2",
+    "Exogenetic-Bot", "BOT_Stockfish13", "Classic_Bot-V2", "InvinxibleFlxsh", "LeelaMultiPoss",
 }
 RATING_CUTOFF = 3100
 
