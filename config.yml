@@ -213,7 +213,7 @@ offer_draw:
 
 resign:
   enabled: true                          # Activate whether the bot should resign games.
-  score: -10000                            # If the score is less than or equal to this value, the bot resigns (in cp).
+  score: -1000                            # If the score is less than or equal to this value, the bot resigns (in cp).
   consecutive_moves: 10                    # How many moves in a row the score has to be below the resign value.
   against_humans: false                    # Activate whether these settings should apply against humans.
   min_rating: 2700
