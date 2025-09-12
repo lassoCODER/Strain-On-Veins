@@ -45,9 +45,10 @@ EnumT = TypeVar('EnumT', bound=StrEnum)
 class User_Interface:
     async def main(self, commands: list[str], config_path: str, allow_upgrade: bool) -> None:
         self.config = Config.from_yaml(config_path)
+        print(f'{LOGO} • {self.config.version}', end='', flush=True)
 
         async with API(self.config) as self.api:
-            print(f'{LOGO} • {self.config.version} • {username}\n')
+            print(f' • {username}\n')
 
             account = await self.api.get_account()
             username: str = account['username']
