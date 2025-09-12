@@ -75,5 +75,5 @@ jobs:
       - name: Run Bot
         run: |
           echo "Starting bot..."
-          python3 -u user_interface.py "tournament CkuwURoH" 
+          python3 -u user_interface.py "matchmaking" 
           
