@@ -1,4 +1,3 @@
-
 import requests
 import io
 import random
@@ -7,12 +6,12 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "three-check"
+VARIANT = "threecheck"
 MAX_PLY = 40
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2730
 
-BOOK_OUTPUT = "threecheck_white.bin"
+BOOK_OUTPUT = "threecheck_book.bin"
 TOURNAMENT_ID = "cLCqUiHC"
 ALLOWED_BOTS = {"NecroMindX", "ToromBot", "Roudypuff", "PINEAPPLEMASK"}
 
@@ -96,7 +95,7 @@ def build_book(bin_path: str):
             continue
         white = game.headers.get("White", "")
         black = game.headers.get("Black", "")
-        if white not in ALLOWED_BOTS:
+        if white not in ALLOWED_BOTS and black not in ALLOWED_BOTS:
             continue
         try:
             white_elo = int(game.headers.get("WhiteElo", 0))
@@ -106,7 +105,7 @@ def build_book(bin_path: str):
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
         kept += 1
-        board = chess.variant.AntichessBoard()
+        board = chess.variant.ThreeCheckBoard()
         result = game.headers.get("Result", "")
         if result == "1-0":
             winner = chess.WHITE
@@ -146,4 +145,3 @@ def build_book(bin_path: str):
 
 if __name__ == "__main__":
     build_book(BOOK_OUTPUT)
-
