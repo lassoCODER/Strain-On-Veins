@@ -188,10 +188,13 @@ class Chatter:
         too_low_rating = (config.offer_draw.min_rating is not None and
                           self.lichess_game.engine.opponent.rating is not None and
                           self.lichess_game.engine.opponent.rating < config.offer_draw.min_rating)
-        if not config.offer_draw.enabled or too_low_rating:
-        return (f'I will accept/offer draws after move {config.offer_draw.min_game_length} '
-                f'if the eval is within +{max_score:.2f} to -{max_score:.2f} for the last '
-                f'{config.offer_draw.consecutive_moves} moves.')
+        no_draw_against_humans = (not self.lichess_game.engine.opponent.is_engine and
+                                  not config.offer_draw.against_humans)
+        if not config.offer_draw.enabled or too_low_rating or no_draw_against_humans:            
+            max_score = config.offer_draw.max_score
+            return (f'I will accept/offer draws after move {config.offer_draw.min_game_length} '
+                    f'if the eval is within +{max_score:.2f} to -{max_score:.2f} for the last '
+                    f'{config.offer_draw.consecutive_moves} moves.')
 
     def _get_name_message(self, version: str) -> str:
         return f'I am NNUE_Drift, and I use {self.lichess_game.engine.name} (BotLi {version})'
