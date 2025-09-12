@@ -184,6 +184,7 @@ opening_books:
       allow_repetitions: true
       names:
         - kothblack
+
     kingofthehill_white:
       selection: best_move
       names:
@@ -337,6 +338,8 @@ books:                                    # Names of the opening books (to be us
   kothblack: "./engines/koth_black.bin"
   black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
-  anti: "./engines/antichess_book.bin"
-  antiw: "./engines/antiw.bin"
+  antichess: "./engines/anti_book.bin"
+  noobanti: "./engines/noobanti.bin"
+  threecheck: "./engines/threecheck_book.bin"
+
 

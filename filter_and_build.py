@@ -14,11 +14,11 @@ REQUEST_TIMEOUT = 120
 SLEEP_BETWEEN_CHUNKS = 0.4
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2730
+MIN_RATING = 2330
 
-BOOK_OUTPUT = "antichess_book.bin"
-TOURNAMENT_ID = "5sx9Kyda"
-ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot"}
+BOOK_OUTPUT = "threecheck_book.bin"
+TOURNAMENT_ID = "cLCqUiHC"
+ALLOWED_BOTS = {"NecroMindX", "ToromBot", "Roudypuff", "PINEAPPLEMASK"}
 
 
 class BookMove:
@@ -95,7 +95,7 @@ def build_book(bin_path: str):
         game = chess.pgn.read_game(stream)
         if game is None:
             break
-        variant_tag = (game.headers.get("Variant", "") or "").lower().replace(" ", "")
+        variant_tag = (game.headers.get("Variant", "") or "").lower()
         if VARIANT not in variant_tag:
             continue
 
