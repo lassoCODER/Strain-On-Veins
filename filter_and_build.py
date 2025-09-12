@@ -6,14 +6,14 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "antichess"
+VARIANT = "threecheck"
 MAX_PLY = 40
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2730
 
-BOOK_OUTPUT = "antichess_book.bin"
-TOURNAMENT_ID = "5sx9Kyda"
-ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot"}
+BOOK_OUTPUT = "threecheck_white.bin"
+TOURNAMENT_ID = "cLCqUiHC"
+ALLOWED_BOTS = {"ToromBot", "NecroMindX", "Roudypuff", "PINEAPPLEMASK"}
 
 
 class BookMove:
@@ -53,7 +53,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():
+                if "@" in m.uci():  # ignore drops (not needed here but safe)
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -105,7 +105,7 @@ def build_book(bin_path: str):
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
         kept += 1
-        board = chess.variant.AntichessBoard()
+        board = chess.variant.ThreeCheckBoard()
         result = game.headers.get("Result", "")
         if result == "1-0":
             winner = chess.WHITE
@@ -116,6 +116,12 @@ def build_book(bin_path: str):
         for ply, move in enumerate(game.mainline_moves()):
             if ply >= MAX_PLY:
                 break
+
+            # Only include White moves
+            if board.turn != chess.WHITE:
+                board.push(move)
+                continue
+
             try:
                 k = key_hex(board)
                 pos = book.get_position(k)
