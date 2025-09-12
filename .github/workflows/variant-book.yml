@@ -26,4 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            threecheck_white.bin
+            threecheck_book.bin
