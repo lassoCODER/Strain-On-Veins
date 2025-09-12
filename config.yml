@@ -88,7 +88,7 @@ opening_books:
   books:
 
     standard_white_rated:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - white
@@ -96,7 +96,7 @@ opening_books:
         - Optimus4
 
       standard_black_rated:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - black
@@ -104,7 +104,7 @@ opening_books:
         - Optimus4
 
     standard_white_casual:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - white
@@ -112,7 +112,7 @@ opening_books:
         - Optimus4
 
       standard_black_casual:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - black
@@ -120,13 +120,13 @@ opening_books:
         - Optimus4
 
       standard_white_human:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - white
 
       standard_black_human:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - black
@@ -134,7 +134,7 @@ opening_books:
         - Optimus4
   
     standard_white_bot:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - white
@@ -142,14 +142,13 @@ opening_books:
         - Optimus4
 
     standard_black_bot:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - black
-        - BlackBook
         
     standard_white_tournament:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - white
@@ -157,14 +156,12 @@ opening_books:
         - BackupBook
 
     standard_black_tournament:
-      selection: best_move
+      selection: weighted_random
       allow_repetitions: true
       names:
         - black
         - DefaultBook
         - BackupBook
-        - BlackBook
-
 
     chess960:
       selection: best_move
@@ -331,7 +328,6 @@ blacklist:                                # List of users who are not challenged
 books:                                    # Names of the opening books (to be used above in the opening_books section) and paths to the opening books.
   DefaultBook: "./engines/Book2.bin"
   BackupBook: "./engines/Book3.bin"
-  BlackBook: "./engines/black.bin"
   Optimus2502: "./engines/OPTIMUS2502.bin"
   Optimus4: "./engines/OPTIMUS4.bin"
   Chess960: "./engines/chess960.bin"
