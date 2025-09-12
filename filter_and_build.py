@@ -9,7 +9,7 @@ import chess.variant
 VARIANT = "threecheck"
 MAX_PLY = 40
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2730
+MIN_RATING = 2330
 
 BOOK_OUTPUT = "threecheck_book.bin"
 TOURNAMENT_ID = "cLCqUiHC"
