@@ -1,153 +1,102 @@
 import requests
 import io
+import os
 import random
 import chess
 import chess.pgn
 import chess.polyglot
-import chess.variant
+from datetime import datetime, timedelta
 
 VARIANT = "threecheck"
-MAX_PLY = 40
+MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2730
 
 BOOK_OUTPUT = "threecheck_white.bin"
-TOURNAMENT_ID = "cLCqUiHC"
-ALLOWED_BOTS = {"ToromBot", "NecroMindX", "Roudypuff", "PINEAPPLEMASK"}
+PGN_FILE = "combined.pgn"
+
+ALLOWED_BOTS = [
+    "ToromBot", "NecroMindX", "Roudypuff", "PINEAPPLEMASK"
+]
+
+def fetch_games(username, max_games=50):
+    url = f"https://lichess.org/api/games/user/{username}"
+    since = int((datetime.utcnow() - timedelta(days=30)).timestamp() * 1000)
+
+    params = {
+        "max": max_games,
+        "rated": "true",
+        "analysed": "false",
+        "perfType": VARIANT,
+        "since": since,
+        "moves": "true",
+        "pgnInJson": "true"
+    }
+
+    headers = {"Accept": "application/x-ndjson"}
+    r = requests.get(url, params=params, headers=headers)
+
+    games = []
+    for line in r.iter_lines():
+        if not line:
+            continue
+        data = line.decode("utf-8")
+        games.append(data)
+    return games
 
 
-class BookMove:
-    def __init__(self):
-        self.weight = 0
-        self.move: chess.Move | None = None
+def save_pgns():
+    with open(PGN_FILE, "w", encoding="utf-8") as f:
+        for bot in ALLOWED_BOTS:
+            games = fetch_games(bot)
+            print(f"Fetched {len(games)} games for {bot}")
+            for g in games:
+                f.write(g + "\n")
 
 
-class BookPosition:
-    def __init__(self):
-        self.moves: dict[str, BookMove] = {}
+def build_book():
+    if not os.path.exists(PGN_FILE):
+        print("No PGN file found.")
+        return
 
-    def get_move(self, uci: str) -> BookMove:
-        return self.moves.setdefault(uci, BookMove())
+    with open(PGN_FILE, "r", encoding="utf-8") as f:
+        pgns = f.read().split("\n")
 
+    parsed = 0
+    kept = 0
 
-class Book:
-    def __init__(self):
-        self.positions: dict[str, BookPosition] = {}
-
-    def get_position(self, key_hex: str) -> BookPosition:
-        return self.positions.setdefault(key_hex, BookPosition())
-
-    def normalize(self):
-        for pos in self.positions.values():
-            s = sum(bm.weight for bm in pos.moves.values())
-            if s <= 0:
+    with chess.polyglot.Writer(open(BOOK_OUTPUT, "wb")) as writer:
+        for pgn in pgns:
+            if not pgn.strip():
                 continue
-            for bm in pos.moves.values():
-                bm.weight = max(1, int(bm.weight / s * MAX_BOOK_WEIGHT))
+            game = chess.pgn.read_game(io.StringIO(pgn))
+            parsed += 1
 
-    def save_polyglot(self, path: str):
-        entries = []
-        for key_hex, pos in self.positions.items():
-            zbytes = bytes.fromhex(key_hex)
-            for bm in pos.moves.values():
-                if bm.weight <= 0 or bm.move is None:
-                    continue
-                m = bm.move
-                if "@" in m.uci():  # ignore drops (not needed here but safe)
-                    continue
-                mi = m.to_square + (m.from_square << 6)
-                if m.promotion:
-                    mi += ((m.promotion - 1) << 12)
-                mbytes = mi.to_bytes(2, "big")
-                wbytes = min(MAX_BOOK_WEIGHT, bm.weight).to_bytes(2, "big")
-                lbytes = (0).to_bytes(4, "big")
-                entries.append(zbytes + mbytes + wbytes + lbytes)
-        entries.sort(key=lambda e: (e[:8], e[10:12]))
-        with open(path, "wb") as f:
-            for e in entries:
-                f.write(e)
-        print(f"Saved {len(entries)} moves to book: {path}")
-
-
-def key_hex(board: chess.Board) -> str:
-    return f"{chess.polyglot.zobrist_hash(board):016x}"
-
-
-def fetch_tournament_games(tour_id: str, max_games: int = 5000):
-    url = f"https://lichess.org/api/tournament/{tour_id}/games"
-    headers = {"Accept": "application/x-chess-pgn"}
-    params = {"max": max_games, "moves": True, "analysed": False, "variant": VARIANT}
-    resp = requests.get(url, headers=headers, params=params)
-    resp.raise_for_status()
-    return io.StringIO(resp.text)
-
-
-def build_book(bin_path: str):
-    book = Book()
-    stream = fetch_tournament_games(TOURNAMENT_ID)
-    processed = kept = 0
-    while True:
-        game = chess.pgn.read_game(stream)
-        if game is None:
-            break
-        variant_tag = (game.headers.get("Variant", "") or "").lower().replace(" ", "")
-        if VARIANT not in variant_tag:
-            continue
-        white = game.headers.get("White", "")
-        black = game.headers.get("Black", "")
-        if white not in ALLOWED_BOTS:
-            continue
-        try:
-            white_elo = int(game.headers.get("WhiteElo", 0))
-            black_elo = int(game.headers.get("BlackElo", 0))
-        except ValueError:
-            continue
-        if white_elo < MIN_RATING or black_elo < MIN_RATING:
-            continue
-        kept += 1
-        board = chess.variant.ThreeCheckBoard()
-        result = game.headers.get("Result", "")
-        if result == "1-0":
-            winner = chess.WHITE
-        elif result == "0-1":
-            winner = chess.BLACK
-        else:
-            winner = None
-        for ply, move in enumerate(game.mainline_moves()):
-            if ply >= MAX_PLY:
-                break
-
-            # Only include White moves
-            if board.turn != chess.WHITE:
-                board.push(move)
+            if game is None or game.headers.get("Variant") != VARIANT:
                 continue
 
-            try:
-                k = key_hex(board)
-                pos = book.get_position(k)
-                bm = pos.get_move(move.uci())
-                bm.move = move
-                decay = max(1, (MAX_PLY - ply) // 5)
-                if winner is not None:
-                    if board.turn == winner:
-                        bm.weight += 5 * decay
-                    else:
-                        bm.weight += 2 * decay
-                else:
-                    bm.weight += 3 * decay
+            if game.headers.get("Result") not in ["1-0", "0-1"]:
+                continue
+
+            if game.headers.get("White") not in ALLOWED_BOTS:
+                continue
+
+            board = game.board()
+            ply = 0
+            for move in game.mainline_moves():
+                if ply > MAX_PLY:
+                    break
+                entry = chess.polyglot.Entry.from_board(
+                    board, move, weight=MAX_BOOK_WEIGHT
+                )
+                writer.write(entry)
                 board.push(move)
-            except Exception:
-                break
-        processed += 1
-        if processed % 50 == 0:
-            print(f"Processed {processed} games")
-    print(f"Parsed {processed} PGNs, kept {kept} games")
-    book.normalize()
-    for pos in book.positions.values():
-        for bm in pos.moves.values():
-            bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 2))
-    book.save_polyglot(bin_path)
+                ply += 1
+            kept += 1
+
+    print(f"Parsed {parsed} PGNs, kept {kept} games")
+    print(f"Saved moves to book: {BOOK_OUTPUT}")
 
 
 if __name__ == "__main__":
-    build_book(BOOK_OUTPUT)
+    save_pgns()
+    build_book()
