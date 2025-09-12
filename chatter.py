@@ -185,9 +185,10 @@ class Chatter:
         return f'{mem_gib:.1f} GiB'
 
     def _get_draw_message(self, config: Config) -> str:
-        if not config.offer_draw.enabled:
-            return 'I will neither accept nor offer draws.'
-        max_score = config.offer_draw.score / 100
+        too_low_rating = (config.offer_draw.min_rating is not None and
+                          self.lichess_game.engine.opponent.rating is not None and
+                          self.lichess_game.engine.opponent.rating < config.offer_draw.min_rating)
+        if not config.offer_draw.enabled or too_low_rating:
         return (f'I will accept/offer draws after move {config.offer_draw.min_game_length} '
                 f'if the eval is within +{max_score:.2f} to -{max_score:.2f} for the last '
                 f'{config.offer_draw.consecutive_moves} moves.')
