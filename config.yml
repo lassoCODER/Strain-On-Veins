@@ -86,7 +86,8 @@ opening_books:
   enabled: true 
   priority: 10000
   books:
-    standard_white:
+
+    standard_white_rated:
       selection: best_move
       allow_repetitions: true
       names:
@@ -94,7 +95,53 @@ opening_books:
         - Optimus2502
         - Optimus4
 
-    standard_black:
+      standard_black_rated:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - black
+        - Optimus2502
+        - Optimus4
+
+    standard_white_casual:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - white
+        - Optimus2502
+        - Optimus4
+
+      standard_black_casual:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - black
+        - Optimus2502
+        - Optimus4
+
+      standard_white_human:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - white
+
+      standard_black_human:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - black
+        - Optimus2502
+        - Optimus4
+  
+    standard_white_bot:
+      selection: best_move
+      allow_repetitions: true
+      names:
+        - white
+        - Optimus2502
+        - Optimus4
+
+    standard_black_bot:
       selection: best_move
       allow_repetitions: true
       names:

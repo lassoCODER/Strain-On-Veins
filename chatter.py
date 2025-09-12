@@ -185,16 +185,23 @@ class Chatter:
         return f'{mem_gib:.1f} GiB'
 
     def _get_draw_message(self, config: Config) -> str:
-        too_low_rating = (config.offer_draw.min_rating is not None and
-                          self.lichess_game.engine.opponent.rating is not None and
-                          self.lichess_game.engine.opponent.rating < config.offer_draw.min_rating)
-        no_draw_against_humans = (not self.lichess_game.engine.opponent.is_engine and
-                                  not config.offer_draw.against_humans)
-        if not config.offer_draw.enabled or too_low_rating or no_draw_against_humans:            
-            max_score = config.offer_draw.max_score
-            return (f'I will accept/offer draws after move {config.offer_draw.min_game_length} '
+        too_low_rating = (
+            getattr(config.offer_draw, 'min_rating', None) is not None and
+            getattr(self.lichess_game.engine.opponent, 'rating', None) is not None and
+            self.lichess_game.engine.opponent.rating < getattr(config.offer_draw, 'min_rating', 0)
+        )
+
+        no_draw_against_humans = (
+            not getattr(self.lichess_game.engine.opponent, 'is_engine', True) and
+            not getattr(config.offer_draw, 'against_humans', False)
+        )
+
+        if not getattr(config.offer_draw, 'enabled', False) or too_low_rating or no_draw_against_humans:            
+            max_score = getattr(config.offer_draw, 'max_score', 0)
+            return (f'I will accept/offer draws after move {getattr(config.offer_draw, "min_game_length", 0)} '
                     f'if the eval is within +{max_score:.2f} to -{max_score:.2f} for the last '
-                    f'{config.offer_draw.consecutive_moves} moves.')
+                    f'{getattr(config.offer_draw, "consecutive_moves", 0)} moves.')
+
 
     def _get_name_message(self, version: str) -> str:
         return f'I am NNUE_Drift, and I use {self.lichess_game.engine.name} (BotLi {version})'
