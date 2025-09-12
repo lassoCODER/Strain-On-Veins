@@ -14,11 +14,11 @@ REQUEST_TIMEOUT = 120
 SLEEP_BETWEEN_CHUNKS = 0.4
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2330
+MIN_RATING = 2730
 
-BOOK_OUTPUT = "threecheck_book.bin"
-TOURNAMENT_ID = "cLCqUiHC"
-ALLOWED_BOTS = {"NecroMindX", "ToromBot", "Roudypuff", "PINEAPPLEMASK"}
+BOOK_OUTPUT = "anti_book_worst.bin"
+TOURNAMENT_ID = "5sx9Kyda"
+ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot", "PINEAPPLEMASK", "DarkOnBot"}
 
 
 class BookMove:
