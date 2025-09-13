@@ -281,25 +281,24 @@ class Chatter:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
         self.pending_use_requests[user_room_key] = chat_message.room
 
+        parts = chat_message.text.strip().split(None, 1)  
+        if len(parts) > 1 and parts[1].strip():
+            cmd = parts[1].lower().lstrip('!').strip()
+            cmd = '!' + cmd
+            explanation = self._get_command_explanation(cmd, chat_message.room)
+            await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
+            return
+
         if chat_message.room == 'player':
             commands_list = 'cpu, draw, eval, motor, name, printeval, ram, ping, roast, destroy, quotes'
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message = (
-            f"Available commands: {commands_list}.\n"
-            "Which command would you like me to explain?\n"
-            "Type !help to know all commands. Then, type !use again."
-        )
+        message = f"Type '!use <command>' (e.g. '!use eval') to get an explanation. Available: {commands_list}."
+        print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room} -> {repr(message)}")
 
-        print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room}")
-        print(f"[DEBUG] Message being sent:\n{message}")
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
 
-        await self.api.send_chat_message(
-            self.game_info.id_,
-            chat_message.room,
-            message
-        )
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
