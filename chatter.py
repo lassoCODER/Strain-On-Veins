@@ -283,8 +283,8 @@ class Chatter:
         parts = chat_message.text.strip().split(None, 1)
         if len(parts) > 1 and parts[1].strip():
             cmd = parts[1].lower().lstrip('!').strip()
-            cmd = '!' + cmd
-            explanation = self._get_command_explanation(cmd, chat_message.room)
+            command = f'!{cmd}'
+            explanation = self._get_command_explanation(command, chat_message.room)
             await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
             return
 
@@ -301,15 +301,15 @@ class Chatter:
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, message2)
 
 
-
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
         room = self.pending_use_requests.pop(user_room_key)
 
-        command = chat_message.text.lower().lstrip('!').strip()
-        command = '!' + command
+        cmd = chat_message.text.lower().lstrip('!').strip()
+        command = f'!{cmd}'
         explanation = self._get_command_explanation(command, room)
         await self.api.send_chat_message(self.game_info.id_, room, explanation)
+
 
     def _get_command_explanation(self, command: str, room: str) -> str:
         explanations = {
