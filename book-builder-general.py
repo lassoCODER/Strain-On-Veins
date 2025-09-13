@@ -9,7 +9,7 @@ import chess.variant
 VARIANT = "horde"
 MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2400
+MIN_RATING = 2350
 MAX_GAMES_PER_BOT = 2000
 
 BOOK_OUTPUT = "horde.bin"
