@@ -280,13 +280,14 @@ class Chatter:
     async def _handle_use_command(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
         
-        parts = chat_message.text.strip().split(None, 1)
-        if len(parts) > 1 and parts[1].strip():
+        parts = chat_message.text.strip().split(maxsplit=1)
+        if len(parts) > 1:
             cmd = parts[1].lower().lstrip('!').strip()
-            command = f'!{cmd}'
-            explanation = self._get_command_explanation(command, chat_message.room)
-            await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
-            return
+            if cmd:
+                command = f'!{cmd}'
+                explanation = self._get_command_explanation(command, chat_message.room)
+                await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
+                return
 
         self.pending_use_requests[user_room_key] = chat_message.room
 
@@ -295,21 +296,22 @@ class Chatter:
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message1 = f"Available commands: {commands_list}."
-        message2 = "Which command would you like me to explain?"
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message1)
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message2)
-
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Available commands: {commands_list}.")
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, "Which command would you like me to explain?")
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
-        room = self.pending_use_requests.pop(user_room_key)
+        room = self.pending_use_requests.pop(user_room_key, None)
+        if not room:
+            return
 
         cmd = chat_message.text.lower().lstrip('!').strip()
+        if not cmd:
+            return
+
         command = f'!{cmd}'
         explanation = self._get_command_explanation(command, room)
         await self.api.send_chat_message(self.game_info.id_, room, explanation)
-
 
     def _get_command_explanation(self, command: str, room: str) -> str:
         explanations = {
