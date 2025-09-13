@@ -83,7 +83,10 @@ class Chatter:
             await self.api.send_chat_message(self.game_info.id_, 'spectator', self.spectator_goodbye)
 
     async def _handle_command(self, chat_message: Chat_Message) -> None:
-        match chat_message.text[1:].lower():
+        text_body = chat_message.text[1:].strip()
+        parts = text_body.split(None, 1)
+        cmd = parts[0].lower() if parts else ''
+        match cmd:
             case 'cpu':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.cpu_message)
             case 'draw':
@@ -279,34 +282,35 @@ class Chatter:
 
     async def _handle_use_command(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
-        self.pending_use_requests[user_room_key] = chat_message.room
-
-        parts = chat_message.text.strip().split(None, 1)  
-        if len(parts) > 1 and parts[1].strip():
-            cmd = parts[1].lower().lstrip('!').strip()
-            cmd = '!' + cmd
-            explanation = self._get_command_explanation(cmd, chat_message.room)
+        
+        parts = chat_message.text.strip().split(maxsplit=1)
+        if len(parts) > 1:
+            cmd = parts[1].strip().lstrip("!")
+            command = f'!{cmd.lower()}'
+            explanation = self._get_command_explanation(command, chat_message.room)
             await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
             return
+
+        self.pending_use_requests[user_room_key] = chat_message.room
 
         if chat_message.room == 'player':
             commands_list = 'cpu, draw, eval, motor, name, printeval, ram, ping, roast, destroy, quotes'
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message1 = f"Available commands: {commands_list}."
-        message2 = "Which command would you like me to explain?"
-        
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message1)
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message2)
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Available commands: {commands_list}.")
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, "Which command would you like me to explain?")
 
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
-        room = self.pending_use_requests.pop(user_room_key)
+        room = self.pending_use_requests.pop(user_room_key, None)
+        if not room:
+            return
 
-        command = chat_message.text.lower().lstrip('!').strip()
-        command = '!' + command
+        cmd = chat_message.text.strip().lstrip("!")
+        command = f'!{cmd.lower()}'
+
         explanation = self._get_command_explanation(command, room)
         await self.api.send_chat_message(self.game_info.id_, room, explanation)
 
@@ -335,4 +339,3 @@ class Chatter:
             return '!pv: This command is only available in spectator chat.'
         else:
             return f'Unknown command: {command}. Type !help to see all available commands.'
-
