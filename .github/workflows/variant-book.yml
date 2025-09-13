@@ -26,4 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            atomic.bin
+            horde.bin
