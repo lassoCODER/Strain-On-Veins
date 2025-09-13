@@ -282,12 +282,14 @@ class Chatter:
         
         parts = chat_message.text.strip().split(maxsplit=1)
         if len(parts) > 1:
-            cmd = parts[1].lower().lstrip('!').strip()
-            if cmd:
-                command = f'!{cmd}'
-                explanation = self._get_command_explanation(command, chat_message.room)
-                await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
-                return
+            cmd = parts[1].strip()
+            if cmd.startswith("!"):
+                command = cmd.lower()
+            else:
+                command = f"!{cmd.lower()}"
+            explanation = self._get_command_explanation(command, chat_message.room)
+            await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
+            return
 
         self.pending_use_requests[user_room_key] = chat_message.room
 
@@ -299,17 +301,19 @@ class Chatter:
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Available commands: {commands_list}.")
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, "Which command would you like me to explain?")
 
+
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
         room = self.pending_use_requests.pop(user_room_key, None)
         if not room:
             return
 
-        cmd = chat_message.text.lower().lstrip('!').strip()
-        if not cmd:
-            return
+        cmd = chat_message.text.strip()
+        if cmd.startswith("!"):
+            command = cmd.lower()
+        else:
+            command = f"!{cmd.lower()}"
 
-        command = f'!{cmd}'
         explanation = self._get_command_explanation(command, room)
         await self.api.send_chat_message(self.game_info.id_, room, explanation)
 
