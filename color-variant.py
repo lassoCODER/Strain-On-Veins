@@ -13,7 +13,7 @@ MIN_RATING = 2400
 
 BOOK_OUTPUT = "horde_white.bin"
 TOURNAMENT_ID = "CydbQlns"
-ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot"}
+ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot", "DarkOnBot", "Yuki_1324", "ToromBot"}
 
 
 class BookMove:
