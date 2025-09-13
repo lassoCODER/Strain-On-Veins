@@ -26,4 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            anti_book_worst.bin
+            atomic.bin
