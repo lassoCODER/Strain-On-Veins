@@ -14,11 +14,11 @@ REQUEST_TIMEOUT = 120
 SLEEP_BETWEEN_CHUNKS = 0.4
 MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2730
+MIN_RATING = 2400
 
-BOOK_OUTPUT = "anti_book_worst.bin"
-TOURNAMENT_ID = "5sx9Kyda"
-ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot", "PINEAPPLEMASK", "DarkOnBot"}
+BOOK_OUTPUT = "horde.bin"
+TOURNAMENT_ID = "CydbQlns"
+ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot"}
 
 
 class BookMove:

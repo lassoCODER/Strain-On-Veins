@@ -338,7 +338,12 @@ books:                                    # Names of the opening books (to be us
   kothblack: "./engines/koth_black.bin"
   black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
-  antichess: "./engines/anti_book_worst.bin"
+  antiwhite: "./engines/whiteanti.bin"
+  antiblack: "./engines/blackanti.bin"
   threecheck: "./engines/threecheck_book.bin"
+  atomic: "./engines/atomic.bin"
+  horde: "./engines/horde.bin"
+
+  
 
 
