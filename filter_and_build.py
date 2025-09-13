@@ -6,14 +6,14 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "antichess"         # must match how Lichess writes it
-MAX_PLY = 60
+VARIANT = "atomic"         
+MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2730
+MIN_RATING = 2475
 
-BOOK_OUTPUT = "anti_book_worst.bin"
-TOURNAMENT_ID = "5sx9Kyda"
-ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot", "PINEAPPLEMASK", "DarkOnBot"}
+BOOK_OUTPUT = "atomic.bin"
+TOURNAMENT_ID = "BAdj3ZMy"
+ALLOWED_BOTS = {"Roudypuff", "ToromBot", "Speedrunchessgames", "DarkOnBot"}
 
 
 class BookMove:
@@ -105,7 +105,7 @@ def build_book(bin_path: str):
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
         kept += 1
-        board = chess.variant.AntichessBoard()
+        board = chess.variant.AtomicBoard()
         result = game.headers.get("Result", "")
         if result == "1-0":
             winner = chess.WHITE
