@@ -51,10 +51,6 @@ class Chatter:
 
         user_room_key = f"{chat_message.username}_{chat_message.room}"
 
-        if chat_message.text.lower().startswith("!use"):
-            await self._handle_use_command(chat_message)
-            return
-
         if user_room_key in self.pending_use_requests:
             await self._handle_use_explanation(chat_message)
             return
@@ -302,7 +298,7 @@ class Chatter:
         await self.api.send_chat_message(
             self.game_info.id_,
             chat_message.room,
-            message.strip()
+            message
         )
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
