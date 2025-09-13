@@ -296,8 +296,7 @@ class Chatter:
 
         message1 = f"Available commands: {commands_list}."
         message2 = "Which command would you like me to explain?"
-        print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room} -> {repr(message)}")
-
+        
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, message1)
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, message2)
 
