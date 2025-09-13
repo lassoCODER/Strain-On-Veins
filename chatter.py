@@ -290,11 +290,8 @@ class Chatter:
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message = (
-            f"Available commands: {commands_list}.\n"
-            "Which command would you like me to explain?\n"
-            "Type !help to know all commands. Then, type !use again."
-        )
+        message = ("Supported commands: !cpu, !draw, !eval, !motor, !name, !printeval, !ram, !ping, !roast, !destroy, !quotes. Which command would you like me to explain?")
+
 
         print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room}")
         print(f"[DEBUG] Message being sent:\n{message}")
@@ -329,7 +326,8 @@ class Chatter:
             '!roast': 'Sends a roast about your play.',
             '!destroy': 'Sends a roast about your play - deadlier than the roast command.',
             '!quotes': 'Shares an inspirational chess quote from famous players.',
-            '!quiet': 'Stops automatic evaluation printing (use after !printeval).'
+            '!quiet': 'Stops automatic evaluation printing (use after !printeval).',
+            '!use': 'Tells the use of any command.'
         }
 
         if command in explanations and explanations[command] is not None:
