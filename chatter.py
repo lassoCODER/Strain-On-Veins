@@ -294,10 +294,13 @@ class Chatter:
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message = f"Available commands: {commands_list}. Which command would you like me to explain?"
+        message1 = f"Available commands: {commands_list}."
+        message2 = "Which command would you like me to explain?"
         print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room} -> {repr(message)}")
 
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message1)
+        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message2)
+
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
