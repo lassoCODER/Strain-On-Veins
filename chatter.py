@@ -294,11 +294,10 @@ class Chatter:
         else:
             commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
 
-        message = f"Type '!use <command>' (e.g. '!use eval') to get an explanation. Available: {commands_list}."
+        message = f"Available commands: {commands_list}. Which command would you like me to explain?"
         print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room} -> {repr(message)}")
 
         await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
-
 
     async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
         user_room_key = f"{chat_message.username}_{chat_message.room}"
@@ -334,3 +333,4 @@ class Chatter:
             return '!pv: This command is only available in spectator chat.'
         else:
             return f'Unknown command: {command}. Type !help to see all available commands.'
+
