@@ -83,7 +83,10 @@ class Chatter:
             await self.api.send_chat_message(self.game_info.id_, 'spectator', self.spectator_goodbye)
 
     async def _handle_command(self, chat_message: Chat_Message) -> None:
-        match chat_message.text[1:].lower():
+        text_body = chat_message.text[1:].strip()
+        parts = text_body.split(None, 1)
+        cmd = parts[0].lower() if parts else ''
+        match cmd:
             case 'cpu':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.cpu_message)
             case 'draw':
@@ -282,11 +285,8 @@ class Chatter:
         
         parts = chat_message.text.strip().split(maxsplit=1)
         if len(parts) > 1:
-            cmd = parts[1].strip()
-            if cmd.startswith("!"):
-                command = cmd.lower()
-            else:
-                command = f"!{cmd.lower()}"
+            cmd = parts[1].strip().lstrip("!")
+            command = f'!{cmd.lower()}'
             explanation = self._get_command_explanation(command, chat_message.room)
             await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
             return
@@ -308,11 +308,8 @@ class Chatter:
         if not room:
             return
 
-        cmd = chat_message.text.strip()
-        if cmd.startswith("!"):
-            command = cmd.lower()
-        else:
-            command = f"!{cmd.lower()}"
+        cmd = chat_message.text.strip().lstrip("!")
+        command = f'!{cmd.lower()}'
 
         explanation = self._get_command_explanation(command, room)
         await self.api.send_chat_message(self.game_info.id_, room, explanation)
@@ -342,4 +339,3 @@ class Chatter:
             return '!pv: This command is only available in spectator chat.'
         else:
             return f'Unknown command: {command}. Type !help to see all available commands.'
-
