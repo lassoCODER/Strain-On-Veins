@@ -9,11 +9,12 @@ import chess.variant
 VARIANT = "horde"         
 MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2400
+MIN_RATING = 2350
 
 BOOK_OUTPUT = "horde.bin"
-ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Fair_Bot", "PINEAPPLEMASK", "ToromBot"}
-MAX_GAMES_PER_BOT = 2000  
+ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot"}
+MAX_GAMES_PER_BOT = 1000  
+
 
 class BookMove:
     def __init__(self):
@@ -80,10 +81,12 @@ def fetch_bot_games(bot_name: str, max_games: int = MAX_GAMES_PER_BOT):
         "moves": True,
         "analysed": False,
         "variant": VARIANT,
-        "perfType": "bullet,blitz,rapid,classical"
+        "perfType": "bullet,blitz,rapid,classical",
+        "bots": True
     }
-    resp = requests.get(url, headers=headers, params=params)
+    resp = requests.get(url, headers=headers, params=params, timeout=10)
     resp.raise_for_status()
+    print(f"Fetched {len(resp.text)} characters of PGN for {bot_name}")
     return io.StringIO(resp.text)
 
 
@@ -98,16 +101,30 @@ def build_book(bin_path: str):
             game = chess.pgn.read_game(stream)
             if game is None:
                 break
-            variant_tag = (game.headers.get("Variant", "") or "").lower()
-            if VARIANT not in variant_tag:
-                continue
+
+            white = game.headers.get("White", "")
+            black = game.headers.get("Black", "")
+            variant_tag = game.headers.get("Variant", "").lower()
             try:
                 white_elo = int(game.headers.get("WhiteElo", 0))
                 black_elo = int(game.headers.get("BlackElo", 0))
             except ValueError:
+                white_elo = black_elo = 0
+
+            print(f"Game: White={white} ({white_elo}), Black={black} ({black_elo}), Variant={variant_tag}")
+
+            if variant_tag != VARIANT.lower():
+                print("Skipped: wrong variant")
                 continue
-            if white_elo < MIN_RATING or black_elo < MIN_RATING:
+
+            if white_elo < MIN_RATING and black_elo < MIN_RATING:
+                print("Skipped: Elo too low")
                 continue
+
+            if white not in ALLOWED_BOTS and black not in ALLOWED_BOTS:
+                print("Skipped: not an allowed bot")
+                continue
+
             kept += 1
             board = chess.variant.HordeBoard()
             result = game.headers.get("Result", "")
@@ -117,6 +134,7 @@ def build_book(bin_path: str):
                 winner = chess.BLACK
             else:
                 winner = None
+
             for ply, move in enumerate(game.mainline_moves()):
                 if ply >= MAX_PLY:
                     break
@@ -137,8 +155,9 @@ def build_book(bin_path: str):
                 except Exception:
                     break
             processed += 1
-            if processed % 50 == 0:
+            if processed % 10 == 0:
                 print(f"Processed {processed} games")
+
     print(f"Parsed {processed} PGNs, kept {kept} games")
     book.normalize()
     for pos in book.positions.values():
