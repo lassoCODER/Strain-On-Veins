@@ -7,7 +7,7 @@ import chess.polyglot
 import chess.variant
 
 VARIANT = "horde"         
-MAX_PLY = 100
+MAX_PLY = 200
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2400
 
