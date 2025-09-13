@@ -1,4 +1,4 @@
-name: Build Variant Book
+name: colour specific variant book
 
 on:
   workflow_dispatch:
