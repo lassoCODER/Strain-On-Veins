@@ -6,14 +6,18 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "horde"         
+VARIANT = "horde"
 MAX_PLY = 200
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2400
 
-BOOK_OUTPUT = "horde_white.bin"
+BOOK_OUTPUT = "horde_black.bin"
 TOURNAMENT_ID = "CydbQlns"
-ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot", "DarkOnBot", "Yuki_1324", "ToromBot"}
+
+ALLOWED_BOTS = {
+    "MaggiChess16", "NecroMindX", "Speedrunchessgames",
+    "Endogenetic-Bot", "DarkOnBot", "Yuki_1324", "ToromBot"
+}
 
 
 class BookMove:
@@ -53,7 +57,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():
+                if "@" in m.uci():  # skip drops (not valid for polyglot)
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -93,10 +97,12 @@ def build_book(bin_path: str):
         variant_tag = (game.headers.get("Variant", "") or "").lower()
         if VARIANT not in variant_tag:
             continue
+
         white = game.headers.get("White", "")
         black = game.headers.get("Black", "")
 
-        if white not in ALLOWED_BOTS:
+        # only keep black bot games
+        if black not in ALLOWED_BOTS:
             continue
 
         try:
@@ -107,15 +113,13 @@ def build_book(bin_path: str):
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
 
+        # only keep games where black wins
+        result = game.headers.get("Result", "")
+        if result != "0-1":
+            continue
+
         kept += 1
         board = chess.variant.HordeBoard()
-        result = game.headers.get("Result", "")
-        if result == "1-0":
-            winner = chess.WHITE
-        elif result == "0-1":
-            winner = chess.BLACK
-        else:
-            winner = None
 
         for ply, move in enumerate(game.mainline_moves()):
             if ply >= MAX_PLY:
@@ -126,13 +130,7 @@ def build_book(bin_path: str):
                 bm = pos.get_move(move.uci())
                 bm.move = move
                 decay = max(1, (MAX_PLY - ply) // 5)
-                if winner is not None:
-                    if board.turn == winner:
-                        bm.weight += 5 * decay
-                    else:
-                        bm.weight += 2 * decay
-                else:
-                    bm.weight += 3 * decay
+                bm.weight += 5 * decay  # reward only black winning lines
                 board.push(move)
             except Exception:
                 break
