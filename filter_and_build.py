@@ -6,14 +6,14 @@ import chess.pgn
 import chess.polyglot
 import chess.variant
 
-VARIANT = "atomic"         
+VARIANT = "horde"         
 MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2475
+MIN_RATING = 2400
 
-BOOK_OUTPUT = "atomic.bin"
-TOURNAMENT_ID = "BAdj3ZMy"
-ALLOWED_BOTS = {"Roudypuff", "ToromBot", "Speedrunchessgames", "DarkOnBot"}
+BOOK_OUTPUT = "horde.bin"
+TOURNAMENT_ID = "CydbQlns"
+ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot"}
 
 
 class BookMove:
@@ -105,7 +105,7 @@ def build_book(bin_path: str):
         if white_elo < MIN_RATING or black_elo < MIN_RATING:
             continue
         kept += 1
-        board = chess.variant.AtomicBoard()
+        board = chess.variant.HordeBoard()
         result = game.headers.get("Result", "")
         if result == "1-0":
             winner = chess.WHITE
