@@ -193,13 +193,13 @@ opening_books:
     antichess_white:
       selection: best_move
       names:
-        - antichess
+        - antiwhite
 
     antichess_black:
       selection: best_move
       allow_repetitions: true
       names:
-        - antichess
+        - antiblack
 
     threecheck_white:
       selection: best_move
@@ -360,7 +360,8 @@ books:                                    # Names of the opening books (to be us
   kothblack: "./engines/koth_black.bin"
   black: "./engines/std_black.bin"
   white: "./engines/std_white.bin"
-  antichess: "./engines/anti_book_worst.bin"
+  antiwhite: "./engines/whiteanti.bin"
+  antiblack: "./engines/blackanti.bin"
   threecheck: "./engines/threecheck_book.bin"
 
 
