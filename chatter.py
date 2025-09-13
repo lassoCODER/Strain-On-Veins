@@ -34,27 +34,32 @@ class Chatter:
         self.print_eval_rooms: set[str] = set()
         self.pending_use_requests: dict[str, str] = {}
 
-    async def handle_chat_message(self, chatLine_Event: dict) -> None:  
-        chat_message = Chat_Message.from_chatLine_event(chatLine_Event)  
-  
-        if chat_message.username == 'lichess':  
-            if chat_message.room == 'player':  
-                print(chat_message.text)  
-            return  
-  
-        if chat_message.username != self.username:  
-            prefix = f'{chat_message.username} ({chat_message.room}): '  
-            output = prefix + chat_message.text  
-            if len(output) > 128:  
-                output = f'{output[:128]}\n{len(prefix) * " "}{output[128:]}'  
-            print(output)  
-  
-        user_room_key = f"{chat_message.username}_{chat_message.room}"  
-        if user_room_key in self.pending_use_requests:  
-            await self._handle_use_explanation(chat_message)  
-            return  
-  
-        if chat_message.text.startswith('!'):  
+    async def handle_chat_message(self, chatLine_Event: dict) -> None:
+        chat_message = Chat_Message.from_chatLine_event(chatLine_Event)
+
+        if chat_message.username == 'lichess':
+            if chat_message.room == 'player':
+                print(chat_message.text)
+            return
+
+        if chat_message.username != self.username:
+            prefix = f'{chat_message.username} ({chat_message.room}): '
+            output = prefix + chat_message.text
+            if len(output) > 128:
+                output = f'{output[:128]}\n{len(prefix) * " "}{output[128:]}'
+            print(output)
+
+        user_room_key = f"{chat_message.username}_{chat_message.room}"
+
+        if chat_message.text.lower().startswith("!use"):
+            await self._handle_use_command(chat_message)
+            return
+
+        if user_room_key in self.pending_use_requests:
+            await self._handle_use_explanation(chat_message)
+            return
+
+        if chat_message.text.startswith('!'):
             await self._handle_command(chat_message)
 
     async def print_eval(self) -> None:
@@ -125,7 +130,7 @@ class Chatter:
             case 'quotes':
                 quote = self._get_random_quote()
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, quote)
-            case 'use':  
+            case 'use':
                 await self._handle_use_command(chat_message)
             case 'help' | 'commands':
                 if chat_message.room == 'player':
@@ -196,12 +201,11 @@ class Chatter:
             not getattr(config.offer_draw, 'against_humans', False)
         )
 
-        if not getattr(config.offer_draw, 'enabled', False) or too_low_rating or no_draw_against_humans:            
+        if not getattr(config.offer_draw, 'enabled', False) or too_low_rating or no_draw_against_humans:
             max_score = getattr(config.offer_draw, 'max_score', 0)
             return (f'I will accept/offer draws after move {getattr(config.offer_draw, "min_game_length", 0)} '
                     f'if the eval is within +{max_score:.2f} to -{max_score:.2f} for the last '
                     f'{getattr(config.offer_draw, "consecutive_moves", 0)} moves.')
-
 
     def _get_name_message(self, version: str) -> str:
         return f'I am NNUE_Drift, and I use {self.lichess_game.engine.name} (BotLi {version})'
@@ -277,48 +281,60 @@ class Chatter:
         ]
         return random.choice(quotes)
 
-    async def _handle_use_command(self, chat_message: Chat_Message) -> None:  
-        user_room_key = f"{chat_message.username}_{chat_message.room}"  
-        self.pending_use_requests[user_room_key] = chat_message.room  
-          
-        if chat_message.room == 'player':  
-            commands_list = 'cpu, draw, eval, motor, name, printeval, ram, ping, roast, destroy, quotes'  
-        else:  
-            commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'  
-          
-        message = f'Available commands: {commands_list}. Which command would you like me to explain?'  
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)  
-  
-    async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:  
-        user_room_key = f"{chat_message.username}_{chat_message.room}"  
-        room = self.pending_use_requests.pop(user_room_key)  
+    async def _handle_use_command(self, chat_message: Chat_Message) -> None:
+        user_room_key = f"{chat_message.username}_{chat_message.room}"
+        self.pending_use_requests[user_room_key] = chat_message.room
+
+        if chat_message.room == 'player':
+            commands_list = 'cpu, draw, eval, motor, name, printeval, ram, ping, roast, destroy, quotes'
+        else:
+            commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
+
+        message = (
+            f"Available commands: {commands_list}.\n"
+            "Which command would you like me to explain?\n"
+            "Type !help to know all commands. Then, type !use again."
+        )
+
+        print(f"[DEBUG] !use triggered by {chat_message.username} in {chat_message.room}")
+        print(f"[DEBUG] Message being sent:\n{message}")
+
+        await self.api.send_chat_message(
+            self.game_info.id_,
+            chat_message.room,
+            message.strip()
+        )
+
+    async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
+        user_room_key = f"{chat_message.username}_{chat_message.room}"
+        room = self.pending_use_requests.pop(user_room_key)
 
         command = chat_message.text.lower().lstrip('!').strip()
         command = '!' + command
-        explanation = self._get_command_explanation(command, room)  
-        await self.api.send_chat_message(self.game_info.id_, room, explanation)  
-  
-    def _get_command_explanation(self, command: str, room: str) -> str:  
-        explanations = {  
+        explanation = self._get_command_explanation(command, room)
+        await self.api.send_chat_message(self.game_info.id_, room, explanation)
+
+    def _get_command_explanation(self, command: str, room: str) -> str:
+        explanations = {
             '!help': 'Shows all available commands which you can use.',
-            '!cpu': 'Shows information about the bot\'s CPU (processor, cores, threads, frequency).',  
-            '!draw': 'Explains the bot\'s draw offering/accepting policy based on evaluation and game length.',  
-            '!eval': 'Shows the current position evaluation from the chess engine.',  
-            '!motor': 'Displays the name of the chess engine currently being used.',  
-            '!name': 'Shows the bot\'s name and engine information.',  
-            '!printeval': 'Enables automatic printing of evaluations after each move (use !quiet to stop).',  
-            '!pv': 'Shows the principal variation (best line of play) from the current position.' if room != 'player' else None,  
-            '!ram': 'Displays the amount of system memory (RAM) available to the bot.',  
-            '!ping': 'Tests the network connection latency to Lichess servers.',  
-            '!roast': 'Sends a roast about your play.',  
-            '!destroy': 'Sends a roast about your play - deadlier than the roast command.',  
-            '!quotes': 'Shares an inspirational chess quote from famous players.',  
-            '!quiet': 'Stops automatic evaluation printing (use after !printeval).'  
-        }  
-          
-        if command in explanations and explanations[command] is not None:  
-            return f'{command}: {explanations[command]}'  
-        elif command == '!pv' and room == 'player':  
-            return '!pv: This command is only available in spectator chat.'  
-        else:  
+            '!cpu': 'Shows information about the bot\'s CPU (processor, cores, threads, frequency).',
+            '!draw': 'Explains the bot\'s draw offering/accepting policy based on evaluation and game length.',
+            '!eval': 'Shows the current position evaluation from the chess engine.',
+            '!motor': 'Displays the name of the chess engine currently being used.',
+            '!name': 'Shows the bot\'s name and engine information.',
+            '!printeval': 'Enables automatic printing of evaluations after each move (use !quiet to stop).',
+            '!pv': 'Shows the principal variation (best line of play) from the current position.' if room != 'player' else None,
+            '!ram': 'Displays the amount of system memory (RAM) available to the bot.',
+            '!ping': 'Tests the network connection latency to Lichess servers.',
+            '!roast': 'Sends a roast about your play.',
+            '!destroy': 'Sends a roast about your play - deadlier than the roast command.',
+            '!quotes': 'Shares an inspirational chess quote from famous players.',
+            '!quiet': 'Stops automatic evaluation printing (use after !printeval).'
+        }
+
+        if command in explanations and explanations[command] is not None:
+            return f'{command}: {explanations[command]}'
+        elif command == '!pv' and room == 'player':
+            return '!pv: This command is only available in spectator chat.'
+        else:
             return f'Unknown command: {command}. Type !help to see all available commands.'
