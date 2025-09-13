@@ -225,12 +225,13 @@ opening_books:
 
     horde_white:
       selection: best_move
+      allow_repetitions: false
       names:
-        - horde
+        - hordew
 
     horde_black:
       selection: best_move
-      allow_repetitions: true
+      allow_repetitions: false
       names:
         - horde  
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
@@ -386,6 +387,7 @@ books:                                    # Names of the opening books (to be us
   threecheck: "./engines/threecheck_book.bin"
   atomic: "./engines/atomic.bin"
   horde: "./engines/horde.bin"
+  hordew: "./engines/horde_white.bin"
 
   
 
