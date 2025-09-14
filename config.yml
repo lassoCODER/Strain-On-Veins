@@ -342,6 +342,7 @@ matchmaking:
 
     horde:                               # Arbitrary name of the matchmaking type. Names must be unique.
       tc: 1+0                             # Time control in initial_minutes+increment_seconds format.
+      variant: horde
       min_rating_diff: 0                  # Minimum rating distance to opponent. Default: 0
       max_rating_diff: 200  
 
