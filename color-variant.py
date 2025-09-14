@@ -7,16 +7,19 @@ import chess.polyglot
 import chess.variant
 
 VARIANT = "horde"
-MAX_PLY = 200
+MAX_PLY = 50
 MAX_BOOK_WEIGHT = 2520
-MIN_RATING = 2400
+MIN_RATING = 2350
+MAX_GAMES_PER_BOT = 2000
 
-BOOK_OUTPUT = "horde_black.bin"
-TOURNAMENT_ID = "CydbQlns"
+BOOK_OUTPUT = "horde_best.bin"
 
 ALLOWED_BOTS = {
-    "MaggiChess16", "NecroMindX", "Speedrunchessgames",
-    "Endogenetic-Bot", "DarkOnBot", "Yuki_1324", "ToromBot"
+    "MaggiChess16",
+    "NecroMindX",
+    "Speedrunchessgames",
+    "Fair_Bot",
+    "ToromBot"
 }
 
 
@@ -57,7 +60,7 @@ class Book:
                 if bm.weight <= 0 or bm.move is None:
                     continue
                 m = bm.move
-                if "@" in m.uci():  # skip drops (not valid for polyglot)
+                if "@" in m.uci():
                     continue
                 mi = m.to_square + (m.from_square << 6)
                 if m.promotion:
@@ -77,10 +80,17 @@ def key_hex(board: chess.Board) -> str:
     return f"{chess.polyglot.zobrist_hash(board):016x}"
 
 
-def fetch_tournament_games(tour_id: str, max_games: int = 5000):
-    url = f"https://lichess.org/api/tournament/{tour_id}/games"
+def fetch_bot_games(bot_name: str, max_games: int = MAX_GAMES_PER_BOT):
+    url = f"https://lichess.org/api/games/user/{bot_name}"
     headers = {"Accept": "application/x-chess-pgn"}
-    params = {"max": max_games, "moves": True, "analysed": False, "variant": VARIANT}
+    params = {
+        "max": max_games,
+        "moves": True,
+        "analysed": False,
+        "variant": VARIANT,
+        "perfType": "horde",
+        "rated": True
+    }
     resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
     return io.StringIO(resp.text)
@@ -88,57 +98,49 @@ def fetch_tournament_games(tour_id: str, max_games: int = 5000):
 
 def build_book(bin_path: str):
     book = Book()
-    stream = fetch_tournament_games(TOURNAMENT_ID)
     processed = kept = 0
-    while True:
-        game = chess.pgn.read_game(stream)
-        if game is None:
-            break
-        variant_tag = (game.headers.get("Variant", "") or "").lower()
-        if VARIANT not in variant_tag:
-            continue
-
-        white = game.headers.get("White", "")
-        black = game.headers.get("Black", "")
-
-        # only keep black bot games
-        if black not in ALLOWED_BOTS:
-            continue
-
-        try:
-            white_elo = int(game.headers.get("WhiteElo", 0))
-            black_elo = int(game.headers.get("BlackElo", 0))
-        except ValueError:
-            continue
-        if white_elo < MIN_RATING or black_elo < MIN_RATING:
-            continue
-
-        # only keep games where black wins
-        result = game.headers.get("Result", "")
-        if result != "0-1":
-            continue
-
-        kept += 1
-        board = chess.variant.HordeBoard()
-
-        for ply, move in enumerate(game.mainline_moves()):
-            if ply >= MAX_PLY:
+    for bot in ALLOWED_BOTS:
+        print(f"Fetching games for bot: {bot}")
+        stream = fetch_bot_games(bot)
+        while True:
+            game = chess.pgn.read_game(stream)
+            if game is None:
                 break
+            variant_tag = (game.headers.get("Variant", "") or "").lower()
+            if VARIANT not in variant_tag:
+                continue
+            white = game.headers.get("White", "")
+            black = game.headers.get("Black", "")
+            if white not in ALLOWED_BOTS and black not in ALLOWED_BOTS:
+                continue
             try:
-                k = key_hex(board)
-                pos = book.get_position(k)
-                bm = pos.get_move(move.uci())
-                bm.move = move
-                decay = max(1, (MAX_PLY - ply) // 5)
-                bm.weight += 5 * decay  # reward only black winning lines
-                board.push(move)
-            except Exception:
-                break
-
-        processed += 1
-        if processed % 50 == 0:
-            print(f"Processed {processed} games")
-
+                white_elo = int(game.headers.get("WhiteElo", 0))
+                black_elo = int(game.headers.get("BlackElo", 0))
+            except ValueError:
+                continue
+            if white_elo < MIN_RATING or black_elo < MIN_RATING:
+                continue
+            result = game.headers.get("Result", "")
+            if result != "1-0":
+                continue
+            kept += 1
+            board = chess.variant.HordeBoard()
+            for ply, move in enumerate(game.mainline_moves()):
+                if ply >= MAX_PLY:
+                    break
+                try:
+                    k = key_hex(board)
+                    pos = book.get_position(k)
+                    bm = pos.get_move(move.uci())
+                    bm.move = move
+                    decay = max(1, (MAX_PLY - ply) // 5)
+                    bm.weight += 5 * decay
+                    board.push(move)
+                except Exception:
+                    break
+            processed += 1
+            if processed % 50 == 0:
+                print(f"Processed {processed} games")
     print(f"Parsed {processed} PGNs, kept {kept} games")
     book.normalize()
     for pos in book.positions.values():

@@ -26,4 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            horde_black.bin
+            horde_best.bin
