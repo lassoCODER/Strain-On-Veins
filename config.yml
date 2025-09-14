@@ -233,7 +233,7 @@ opening_books:
       selection: best_move
       allow_repetitions: false
       names:
-        - horde
+        - hordeblack
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
 
@@ -387,6 +387,7 @@ books:                                    # Names of the opening books (to be us
   threecheck: "./engines/threecheck_book.bin"
   atomic: "./engines/atomic.bin"
   horde: "./engines/horde.bin"
+  hordeblack: "./engines/black_horde.bin"
 
   
 
