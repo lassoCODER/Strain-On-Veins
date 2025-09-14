@@ -234,8 +234,8 @@ opening_books:
       selection: best_move
       allow_repetitions: false
       names:
-        - hordenoob
         - hordeblack
+        - hordenoob
 #   'antichess', 'atomic', 'chess960', 'crazyhouse', 'horde', 'kingofthehill', 'racingkings' and '3check' as well.
 #   Append '_white', '_black' or '_human' to use the engine only as the specific color or against humans.
 
