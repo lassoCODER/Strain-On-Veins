@@ -32,7 +32,6 @@ class Chatter:
         self.spectator_greeting = self._format_message(config.messages.greeting_spectators)
         self.spectator_goodbye = self._format_message(config.messages.goodbye_spectators)
         self.print_eval_rooms: set[str] = set()
-        self.pending_use_requests: dict[str, str] = {}
 
     async def handle_chat_message(self, chatLine_Event: dict) -> None:
         chat_message = Chat_Message.from_chatLine_event(chatLine_Event)
@@ -48,12 +47,6 @@ class Chatter:
             if len(output) > 128:
                 output = f'{output[:128]}\n{len(prefix) * " "}{output[128:]}'
             print(output)
-
-        user_room_key = f"{chat_message.username}_{chat_message.room}"
-
-        if user_room_key in self.pending_use_requests:
-            await self._handle_use_explanation(chat_message)
-            return
 
         if chat_message.text.startswith('!'):
             await self._handle_command(chat_message)
@@ -86,6 +79,8 @@ class Chatter:
         text_body = chat_message.text[1:].strip()
         parts = text_body.split(None, 1)
         cmd = parts[0].lower() if parts else ''
+        arg = parts[1].strip() if len(parts) > 1 else None
+
         match cmd:
             case 'cpu':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.cpu_message)
@@ -129,14 +124,20 @@ class Chatter:
             case 'quotes':
                 quote = self._get_random_quote()
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, quote)
-            case 'use':
-                await self._handle_use_command(chat_message)
             case 'help' | 'commands':
-                if chat_message.room == 'player':
-                    message = 'Supported commands: !cpu, !draw, !eval, !motor, !name, !printeval, !ram, !ping, !roast, !destroy, !quotes, !use'
+                if arg:
+                    command = arg.lstrip("!")
+                    explanation = self._get_command_explanation(f"!{command.lower()}", chat_message.room)
+                    await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
                 else:
-                    message = 'Supported commands: !cpu, !draw, !eval, !motor, !name, !printeval, !pv, !ram, !ping, !roast, !destroy, !quotes, !use'
-                await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
+                    if chat_message.room == 'player':
+                    if chat_message.room == 'player':
+                        message = ('Supported commands: !cpu, !draw, !eval, !motor, !name, !ping, !printeval, !ram, !takeback. '
+                                   'Type !help <command> for more information.')
+                    else:
+                        message = ('Supported commands: !cpu, !draw, !eval, !motor, !name, !ping, !printeval, !pv, !ram, !takeback. '
+                                   'Type !help <command> for more information.')
+                    await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
 
     async def _send_last_message(self, room: str) -> None:
         last_message = self.lichess_game.last_message.replace('Engine', 'Evaluation')
@@ -280,43 +281,9 @@ class Chatter:
         ]
         return random.choice(quotes)
 
-    async def _handle_use_command(self, chat_message: Chat_Message) -> None:
-        user_room_key = f"{chat_message.username}_{chat_message.room}"
-        
-        parts = chat_message.text.strip().split(maxsplit=1)
-        if len(parts) > 1:
-            cmd = parts[1].strip().lstrip("!")
-            command = f'!{cmd.lower()}'
-            explanation = self._get_command_explanation(command, chat_message.room)
-            await self.api.send_chat_message(self.game_info.id_, chat_message.room, explanation)
-            return
-
-        self.pending_use_requests[user_room_key] = chat_message.room
-
-        if chat_message.room == 'player':
-            commands_list = 'cpu, draw, eval, motor, name, printeval, ram, ping, roast, destroy, quotes'
-        else:
-            commands_list = 'cpu, draw, eval, motor, name, printeval, pv, ram, ping, roast, destroy, quotes'
-
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Available commands: {commands_list}.")
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, "Which command would you like me to explain?")
-
-
-    async def _handle_use_explanation(self, chat_message: Chat_Message) -> None:
-        user_room_key = f"{chat_message.username}_{chat_message.room}"
-        room = self.pending_use_requests.pop(user_room_key, None)
-        if not room:
-            return
-
-        cmd = chat_message.text.strip().lstrip("!")
-        command = f'!{cmd.lower()}'
-
-        explanation = self._get_command_explanation(command, room)
-        await self.api.send_chat_message(self.game_info.id_, room, explanation)
-
     def _get_command_explanation(self, command: str, room: str) -> str:
         explanations = {
-            '!help': 'Shows all available commands which you can use.',
+            '!help': 'Shows all available commands or explains a specific one if given an argument.',
             '!cpu': 'Shows information about the bot\'s CPU (processor, cores, threads, frequency).',
             '!draw': 'Explains the bot\'s draw offering/accepting policy based on evaluation and game length.',
             '!eval': 'Shows the current position evaluation from the chess engine.',
@@ -329,8 +296,7 @@ class Chatter:
             '!roast': 'Sends a roast about your play.',
             '!destroy': 'Sends a roast about your play - deadlier than the roast command.',
             '!quotes': 'Shares an inspirational chess quote from famous players.',
-            '!quiet': 'Stops automatic evaluation printing (use after !printeval).',
-            '!use': 'Tells the use of any command.'
+            '!quiet': 'Stops automatic evaluation printing (use after !printeval).'
         }
 
         if command in explanations and explanations[command] is not None:
