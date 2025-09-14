@@ -342,8 +342,8 @@ books:                                    # Names of the opening books (to be us
   antiblack: "./engines/blackanti.bin"
   threecheck: "./engines/threecheck_book.bin"
   atomic: "./engines/atomic.bin"
-  hordeb: "./engines/horde_black.bin"
-  hordew: "./engines/horde_white.bin"
+  horde: "./engines/horde.bin"
+  hordeblack: "./engines/black_horde.bin"
 
   
 
