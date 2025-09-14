@@ -227,7 +227,7 @@ opening_books:
       selection: best_move
       allow_repetitions: true
       names:
-        - hordeblack
+        - hordewhite
         - hordenoob
 
     horde_black:
@@ -395,6 +395,7 @@ books:                                    # Names of the opening books (to be us
   horde: "./engines/horde.bin"
   hordeblack: "./engines/black_horde.bin"
   hordenoob: "./engines/horde.bin"
+  hordewhite: "./engines/horde_best.bin"
 
   
 
