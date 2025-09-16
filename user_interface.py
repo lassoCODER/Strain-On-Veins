@@ -15,7 +15,7 @@ from enums import Challenge_Color, Perf_Type, Variant
 from event_handler import Event_Handler
 from game_manager import Game_Manager
 from logo import show_logo
-from console import console   # ✅ use shared console
+from console import console   
 from rich.prompt import Prompt
 from rich.text import Text
 from rich.panel import Panel
