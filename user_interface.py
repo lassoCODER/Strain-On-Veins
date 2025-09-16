@@ -15,7 +15,7 @@ from enums import Challenge_Color, Perf_Type, Variant
 from event_handler import Event_Handler
 from game_manager import Game_Manager
 from logo import show_logo
-from rich.console import Console
+from console import console   
 from rich.prompt import Prompt
 from rich.text import Text
 from rich.panel import Panel
@@ -24,8 +24,6 @@ try:
     import readline
 except ImportError:
     readline = None
-
-console = Console()
 
 COMMANDS = {
     'blacklist': 'Temporarily blacklists a user. Use config for permanent blacklisting. Usage: blacklist USERNAME',
