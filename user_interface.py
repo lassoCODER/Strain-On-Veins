@@ -1,4 +1,3 @@
-
 import argparse
 import asyncio
 import logging
@@ -15,12 +14,18 @@ from engine import Engine
 from enums import Challenge_Color, Perf_Type, Variant
 from event_handler import Event_Handler
 from game_manager import Game_Manager
-from logo import LOGO
+from logo import show_logo
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.text import Text
+from rich.panel import Panel
 
 try:
     import readline
 except ImportError:
     readline = None
+
+console = Console()
 
 COMMANDS = {
     'blacklist': 'Temporarily blacklists a user. Use config for permanent blacklisting. Usage: blacklist USERNAME',
@@ -45,12 +50,18 @@ EnumT = TypeVar('EnumT', bound=StrEnum)
 class User_Interface:
     async def main(self, commands: list[str], config_path: str, allow_upgrade: bool) -> None:
         self.config = Config.from_yaml(config_path)
-        print(f'{LOGO} • {self.config.version}', end='', flush=True)
+
+        # Show fancy colorful logo
+        show_logo(self.config.version)
 
         async with API(self.config) as self.api:
             account = await self.api.get_account()
             username: str = account['username']
-            print(f' • {username}\n')
+
+            console.print(Panel.fit(
+                Text(f" • Logged in as {username}", style="bold green"),
+                border_style="green"
+            ))
 
             self.api.append_user_agent(username)
             await self._handle_bot_status(account.get('title'), allow_upgrade)
@@ -79,46 +90,50 @@ class User_Interface:
                 readline.parse_and_bind('tab: complete')
 
             while True:
-                command = (await asyncio.to_thread(input)).split()
+                command = (await asyncio.to_thread(input, "[cyan]BotLi › [/cyan]")).split()
                 if len(command) > 0:
                     await self._handle_command(command)
 
     async def _handle_bot_status(self, title: str | None, allow_upgrade: bool) -> None:
-        if 'bot:play' not in await self.api.get_token_scopes(self.config.token):
-            print('Your token is missing the bot:play scope. This is mandatory to use BotLi.\n'
-                  'You can create such a token by following this link:\n'
-                  'https://lichess.org/account/oauth/token/create?scopes[]=bot:play&description=BotLi')
+        scopes = await self.api.get_token_scopes(self.config.token)
+        if 'bot:play' not in scopes:
+            console.print(Panel(
+                "[red]Your token is missing the bot:play scope.[/red]\n"
+                "This is mandatory to use BotLi.\n"
+                "Create a token here:\n[cyan]https://lichess.org/account/oauth/token/create?scopes[]=bot:play&description=BotLi[/cyan]",
+                border_style="red"
+            ))
             sys.exit(1)
 
         if title == 'BOT':
             return
 
-        print('\nBotLi can only be used by BOT accounts!\n')
+        console.print(Panel(
+            "[yellow]BotLi can only be used by BOT accounts![/yellow]",
+            border_style="yellow"
+        ))
 
         if not sys.stdin.isatty() and not allow_upgrade:
-            print('Start BotLi with the "--upgrade" flag if you are sure you want to upgrade this account.\n'
-                  'WARNING: This is irreversible. The account will only be able to play as a BOT.')
+            console.print("[red]Start with --upgrade if you want to upgrade this account to a BOT account.[/red]")
             sys.exit(1)
         elif sys.stdin.isatty():
-            print('This will upgrade your account to a BOT account.\n'
-                  'WARNING: This is irreversible. The account will only be able to play as a BOT.')
-            approval = input('Do you want to continue? [y/N]: ')
-
-            if approval.lower() not in ['y', 'yes']:
-                print('Upgrade aborted.')
+            console.print("[yellow]This will upgrade your account to a BOT account. (Irreversible)[/yellow]")
+            approval = Prompt.ask("Do you want to continue?", choices=["y", "n"], default="n")
+            if approval.lower() != "y":
+                console.print("[red]Upgrade aborted.[/red]")
                 sys.exit()
 
         if await self.api.upgrade_account():
-            print('Upgrade successful.')
+            console.print("[green]Upgrade successful.[/green]")
         else:
-            print('Upgrade failed.')
+            console.print("[red]Upgrade failed.[/red]")
             sys.exit(1)
 
     async def _test_engines(self) -> None:
         for engine_name, engine_config in self.config.engines.items():
-            print(f'Testing engine "{engine_name}" ... ', end='', flush=True)
+            console.print(Text(f'Testing engine "{engine_name}" ... ', style="bold cyan"), end="")
             await Engine.test(engine_config)
-            print('OK')
+            console.print(Text("OK", style="bold green"))
 
     async def _handle_command(self, command: list[str]) -> None:
         match command[0]:
@@ -154,14 +169,14 @@ class User_Interface:
 
     def _blacklist(self, command: list[str]) -> None:
         if len(command) != 2:
-            print(COMMANDS['blacklist'])
+            console.print(COMMANDS['blacklist'], style="yellow")
             return
         self.config.blacklist.append(command[1].lower())
-        print(f'Added {command[1]} to the blacklist.')
+        console.print(f'[bold red]Added {command[1]} to the blacklist.[/bold red]')
 
     def _challenge(self, command: list[str]) -> None:
         if len(command) < 2 or len(command) > 6:
-            print(COMMANDS['challenge'])
+            console.print(COMMANDS['challenge'], style="yellow")
             return
         try:
             opponent_username = command[1]
@@ -173,19 +188,19 @@ class User_Interface:
             rated = command[4].lower() in ['true', 'yes', 'rated'] if len(command) > 4 else True
             variant = self._find_enum(command[5], Variant) if len(command) > 5 else Variant.STANDARD
         except ValueError as e:
-            print(e)
+            console.print(f"[red]{e}[/red]")
             return
         challenge_request = Challenge_Request(opponent_username, initial_time, increment, rated, color, variant, 300)
         self.game_manager.request_challenge(challenge_request)
-        print(f'Challenge against {challenge_request.opponent_username} added to the queue.')
+        console.print(f'[green]Challenge against {challenge_request.opponent_username} added to the queue.[/green]')
 
     def _clear(self) -> None:
         self.game_manager.challenge_requests.clear()
-        print('Challenge queue cleared.')
+        console.print('[yellow]Challenge queue cleared.[/yellow]')
 
     def _create(self, command: list[str]) -> None:
         if len(command) < 3 or len(command) > 6:
-            print(COMMANDS['create'])
+            console.print(COMMANDS['create'], style="yellow")
             return
         try:
             count = int(command[1])
@@ -197,7 +212,7 @@ class User_Interface:
             rated = command[4].lower() in ['true', 'yes', 'rated'] if len(command) > 4 else True
             variant = self._find_enum(command[5], Variant) if len(command) > 5 else Variant.STANDARD
         except ValueError as e:
-            print(e)
+            console.print(f"[red]{e}[/red]")
             return
         challenges: list[Challenge_Request] = []
         for _ in range(count):
@@ -206,39 +221,39 @@ class User_Interface:
             challenges.append(Challenge_Request(opponent_username, initial_time,
                               increment, rated, Challenge_Color.BLACK, variant, 300))
         self.game_manager.request_challenge(*challenges)
-        print(f'Challenges for {count} game pairs against {opponent_username} added to the queue.')
+        console.print(f'[green]Challenges for {count} game pairs against {opponent_username} added to the queue.[/green]')
 
     async def _join(self, command: list[str]) -> None:
         if len(command) < 2 or len(command) > 3:
-            print(COMMANDS['join'])
+            console.print(COMMANDS['join'], style="yellow")
             return
         password = command[2] if len(command) > 2 else None
         if await self.api.join_team(command[1], password):
-            print(f'Joined team "{command[1]}" successfully.')
+            console.print(f'[green]Joined team "{command[1]}" successfully.[/green]')
 
     def _leave(self, command: list[str]) -> None:
         if len(command) != 2:
-            print(COMMANDS['leave'])
+            console.print(COMMANDS['leave'], style="yellow")
             return
         self.game_manager.request_tournament_leaving(command[1])
 
     def _matchmaking(self) -> None:
-        print('Starting matchmaking ...')
+        console.print('[cyan]Starting matchmaking ...[/cyan]')
         self.game_manager.start_matchmaking()
 
     async def _quit(self) -> None:
         self.game_manager.stop()
-        print('Terminating program ...')
+        console.print('[red]Terminating program ...[/red]')
         self.event_handler_task.cancel()
         await self.game_manager_task
 
     def _rechallenge(self) -> None:
         last_challenge_event = self.event_handler.last_challenge_event
         if last_challenge_event is None:
-            print('No last challenge available.')
+            console.print('[yellow]No last challenge available.[/yellow]')
             return
         if last_challenge_event['speed'] == 'correspondence':
-            print('Correspondence is not supported by BotLi.')
+            console.print('[red]Correspondence is not supported.[/red]')
             return
         opponent_username: str = last_challenge_event['challenger']['name']
         initial_time: int = last_challenge_event['timeControl']['limit']
@@ -254,29 +269,29 @@ class User_Interface:
             color = Challenge_Color.RANDOM
         challenge_request = Challenge_Request(opponent_username, initial_time, increment, rated, color, variant, 300)
         self.game_manager.request_challenge(challenge_request)
-        print(f'Challenge against {challenge_request.opponent_username} added to the queue.')
+        console.print(f'[green]Challenge against {challenge_request.opponent_username} added to the queue.[/green]')
 
     def _reset(self, command: list[str]) -> None:
         if len(command) != 2:
-            print(COMMANDS['reset'])
+            console.print(COMMANDS['reset'], style="yellow")
             return
         try:
             perf_type = self._find_enum(command[1], Perf_Type)
         except ValueError as e:
-            print(e)
+            console.print(f"[red]{e}[/red]")
             return
         self.game_manager.matchmaking.opponents.reset_release_time(perf_type)
-        print('Matchmaking has been reset.')
+        console.print('[cyan]Matchmaking has been reset.[/cyan]')
 
     def _stop(self) -> None:
         if self.game_manager.stop_matchmaking():
-            print('Stopping matchmaking ...')
+            console.print('[red]Stopping matchmaking ...[/red]')
         else:
-            print('Matchmaking isn\'t currently running ...')
+            console.print('[yellow]Matchmaking isn\'t currently running ...[/yellow]')
 
     def _tournament(self, command: list[str]) -> None:
         if len(command) < 2 or len(command) > 4:
-            print(COMMANDS['tournament'])
+            console.print(COMMANDS['tournament'], style="yellow")
             return
         tournament_id = command[1]
         tournament_team = command[2] if len(command) > 2 else None
@@ -285,15 +300,15 @@ class User_Interface:
 
     def _whitelist(self, command: list[str]) -> None:
         if len(command) != 2:
-            print(COMMANDS['whitelist'])
+            console.print(COMMANDS['whitelist'], style="yellow")
             return
         self.config.whitelist.append(command[1].lower())
-        print(f'Added {command[1]} to the whitelist.')
+        console.print(f'[green]Added {command[1]} to the whitelist.[/green]')
 
     def _help(self) -> None:
-        print('These commands are supported by BotLi:\n')
+        console.print(Panel.fit("[bold cyan]These commands are supported by BotLi:[/bold cyan]", border_style="cyan"))
         for key, value in COMMANDS.items():
-            print(f'{key:11}\t\t# {value}')
+            console.print(f'[yellow]{key:11}[/yellow]\t\t# {value}')
 
     def _find_enum(self, name: str, enum_type: type[EnumT]) -> EnumT:
         for enum in enum_type:
