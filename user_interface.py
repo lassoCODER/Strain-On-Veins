@@ -18,6 +18,7 @@ from logo import show_logo
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.text import Text
+from rich.panel import Panel
 
 try:
     import readline
@@ -50,13 +51,17 @@ class User_Interface:
     async def main(self, commands: list[str], config_path: str, allow_upgrade: bool) -> None:
         self.config = Config.from_yaml(config_path)
 
+        # Show fancy colorful logo
         show_logo(self.config.version)
 
         async with API(self.config) as self.api:
             account = await self.api.get_account()
             username: str = account['username']
 
-            console.print(Text(f" • Logged in as {username}", style="bold green"))
+            console.print(Panel.fit(
+                Text(f" • Logged in as {username}", style="bold green"),
+                border_style="green"
+            ))
 
             self.api.append_user_agent(username)
             await self._handle_bot_status(account.get('title'), allow_upgrade)
@@ -85,24 +90,28 @@ class User_Interface:
                 readline.parse_and_bind('tab: complete')
 
             while True:
-                command = (await asyncio.to_thread(input)).split()
+                command = (await asyncio.to_thread(input, "[cyan]BotLi › [/cyan]")).split()
                 if len(command) > 0:
                     await self._handle_command(command)
 
     async def _handle_bot_status(self, title: str | None, allow_upgrade: bool) -> None:
         scopes = await self.api.get_token_scopes(self.config.token)
         if 'bot:play' not in scopes:
-            console.print(
+            console.print(Panel(
                 "[red]Your token is missing the bot:play scope.[/red]\n"
                 "This is mandatory to use BotLi.\n"
-                "Create a token here: [cyan]https://lichess.org/account/oauth/token/create?scopes[]=bot:play&description=BotLi[/cyan]"
-            )
+                "Create a token here:\n[cyan]https://lichess.org/account/oauth/token/create?scopes[]=bot:play&description=BotLi[/cyan]",
+                border_style="red"
+            ))
             sys.exit(1)
 
         if title == 'BOT':
             return
 
-        console.print("[yellow]BotLi can only be used by BOT accounts![/yellow]\n")
+        console.print(Panel(
+            "[yellow]BotLi can only be used by BOT accounts![/yellow]",
+            border_style="yellow"
+        ))
 
         if not sys.stdin.isatty() and not allow_upgrade:
             console.print("[red]Start with --upgrade if you want to upgrade this account to a BOT account.[/red]")
@@ -122,7 +131,7 @@ class User_Interface:
 
     async def _test_engines(self) -> None:
         for engine_name, engine_config in self.config.engines.items():
-            console.print(Text(f'Testing engine "{engine_name}" ... ', style="cyan"), end="")
+            console.print(Text(f'Testing engine "{engine_name}" ... ', style="bold cyan"), end="")
             await Engine.test(engine_config)
             console.print(Text("OK", style="bold green"))
 
@@ -163,7 +172,7 @@ class User_Interface:
             console.print(COMMANDS['blacklist'], style="yellow")
             return
         self.config.blacklist.append(command[1].lower())
-        console.print(f'[red]Added {command[1]} to the blacklist.[/red]')
+        console.print(f'[bold red]Added {command[1]} to the blacklist.[/bold red]')
 
     def _challenge(self, command: list[str]) -> None:
         if len(command) < 2 or len(command) > 6:
@@ -297,7 +306,7 @@ class User_Interface:
         console.print(f'[green]Added {command[1]} to the whitelist.[/green]')
 
     def _help(self) -> None:
-        console.print('[bold cyan]These commands are supported by BotLi:[/bold cyan]\n')
+        console.print(Panel.fit("[bold cyan]These commands are supported by BotLi:[/bold cyan]", border_style="cyan"))
         for key, value in COMMANDS.items():
             console.print(f'[yellow]{key:11}[/yellow]\t\t# {value}')
 
