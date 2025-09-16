@@ -11,7 +11,7 @@ ______       _   _     _
 | |_/ / (_) | |_| |___| |
 \____/ \___/ \__\_____/_|'''
 
-def show_logo():
+def show_logo(version: str | None = None):
     colors = ["magenta", "cyan", "green", "yellow", "blue", "red"]
     for i, line in enumerate(LOGO.splitlines()):
         if line.strip():
@@ -20,4 +20,6 @@ def show_logo():
             console.print()
 
     tagline = Text("BotLi", style="bold magenta")
+    if version:
+        tagline.append(f" • {version}", style="cyan")
     console.print(tagline, justify="center")
