@@ -1,7 +1,5 @@
-from rich.console import Console
+from console import console
 from rich.text import Text
-
-console = Console()
 
 LOGO = r'''
 ______       _   _     _
