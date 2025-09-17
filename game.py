@@ -6,6 +6,7 @@ from botli_dataclasses import Game_Information
 from chatter import Chatter
 from config import Config
 from lichess_game import Lichess_Game
+from console import cprint   
 
 
 class Game:
@@ -46,7 +47,9 @@ class Game:
 
         if info.tournament_id is None:
             abortion_seconds = 30 if info.opponent_is_bot else 60
-            self.abortion_task = asyncio.create_task(self._abortion_task(lichess_game, chatter, abortion_seconds))
+            self.abortion_task = asyncio.create_task(
+                self._abortion_task(lichess_game, chatter, abortion_seconds)
+            )
         max_takebacks = 0 if info.opponent_is_bot else self.config.challenge.max_takebacks
 
         while event := await game_stream_queue.get():
@@ -85,7 +88,9 @@ class Game:
                 break
 
             if has_updated:
-                self.move_task = asyncio.create_task(self._make_move(lichess_game, chatter))
+                self.move_task = asyncio.create_task(
+                    self._make_move(lichess_game, chatter)
+                )
 
         if self.abortion_task:
             self.abortion_task.cancel()
@@ -104,7 +109,7 @@ class Game:
         await asyncio.sleep(abortion_seconds)
 
         if not lichess_game.is_our_turn and lichess_game.is_abortable:
-            print('Aborting game ...')
+            cprint('[yellow]Aborting game ...[/yellow]')  
             await self.api.abort_game(self.game_id)
             await chatter.send_abortion_message()
 
@@ -112,10 +117,12 @@ class Game:
 
     def _print_game_information(self, info: Game_Information) -> None:
         opponents_str = f'{info.white_str}   -   {info.black_str}'
-        message = (5 * ' ').join([info.id_str, opponents_str, info.tc_str,
-                                  info.rated_str, info.variant_str])
+        message = (5 * ' ').join([
+            info.id_str, opponents_str, info.tc_str,
+            info.rated_str, info.variant_str
+        ])
 
-        print(f'\n{message}\n{128 * "‾"}')
+        cprint(f'\n{message}\n{128 * "‾"}')  
 
     def _print_result_message(self,
                               game_state: dict[str, Any],
@@ -179,4 +186,4 @@ class Game:
         opponents_str = f'{info.white_str} {white_result} - {black_result} {info.black_str}'
         message = (5 * ' ').join([info.id_str, opponents_str, message])
 
-        print(f'{message}\n{128 * "‾"}')
+        cprint(f'{message}\n{128 * "‾"}')  
