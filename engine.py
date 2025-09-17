@@ -1,3 +1,4 @@
+
 import asyncio
 import os
 import subprocess
@@ -56,14 +57,14 @@ class Engine:
                                 syzygy_config: Syzygy_Config) -> None:
         for name, value in engine_config.uci_options.items():
             if name.lower() in chess.engine.MANAGED_OPTIONS:
-                cprint(f'[yellow]UCI option "{name}" ignored[/yellow] '
-                              f'[dim](managed by bot)[/dim]')
+                cprint(f'UCI option "{name}" ignored'
+                              f'(managed by bot)')
             elif name in engine.options:
                 await engine.configure({name: value})
-                cprint(f'[green]UCI option "{name}" set to {value}[/green]')
+                cprint(f'UCI option "{name}" set to {value}')
             else:
-                cprint(f'[red]UCI option "{name}" ignored[/red] '
-                              f'[dim](not supported by engine)[/dim]')
+                cprint(f'UCI option "{name}" ignored '
+                              f'(not supported by engine)')
 
         if not syzygy_config.enabled:
             return
@@ -71,11 +72,11 @@ class Engine:
         if 'SyzygyPath' in engine.options and 'SyzygyPath' not in engine_config.uci_options:
             delimiter = ';' if os.name == 'nt' else ':'
             await engine.configure({'SyzygyPath': delimiter.join(syzygy_config.paths)})
-            cprint(f'[cyan]SyzygyPath set[/cyan]')
+            cprint(f'SyzygyPath set')
 
         if 'SyzygyProbeLimit' in engine.options and 'SyzygyProbeLimit' not in engine_config.uci_options:
             await engine.configure({'SyzygyProbeLimit': syzygy_config.max_pieces})
-            cprint(f'[cyan]SyzygyProbeLimit set to {syzygy_config.max_pieces}[/cyan]')
+            cprint(f'SyzygyProbeLimit set to {syzygy_config.max_pieces}')
 
     @property
     def name(self) -> str:
@@ -105,7 +106,7 @@ class Engine:
         result = await self.engine.play(board, limit, info=chess.engine.INFO_ALL, ponder=ponder)
 
         if not result.move:
-            cprint('[bold red]Engine could not make a move![/bold red]')
+            cprint('Engine could not make a move!')
             raise RuntimeError('Engine could not make a move!')
 
         return result.move, result.info
@@ -123,6 +124,6 @@ class Engine:
         try:
             await asyncio.wait_for(self.engine.quit(), 5.0)
         except TimeoutError:
-            cprint('[red]Engine could not be terminated cleanly.[/red]')
+            cprint('Engine could not be terminated cleanly.')
 
         self.transport.close()
