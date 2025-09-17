@@ -6,7 +6,7 @@ import chess
 import chess.engine
 
 from configs import Engine_Config, Limit_Config, Syzygy_Config
-from console import console
+from console import cprint
 
 
 class Engine:
@@ -56,13 +56,13 @@ class Engine:
                                 syzygy_config: Syzygy_Config) -> None:
         for name, value in engine_config.uci_options.items():
             if name.lower() in chess.engine.MANAGED_OPTIONS:
-                console.print(f'[yellow]UCI option "{name}" ignored[/yellow] '
+                cprint(f'[yellow]UCI option "{name}" ignored[/yellow] '
                               f'[dim](managed by bot)[/dim]')
             elif name in engine.options:
                 await engine.configure({name: value})
-                console.print(f'[green]UCI option "{name}" set to {value}[/green]')
+                cprint(f'[green]UCI option "{name}" set to {value}[/green]')
             else:
-                console.print(f'[red]UCI option "{name}" ignored[/red] '
+                cprint(f'[red]UCI option "{name}" ignored[/red] '
                               f'[dim](not supported by engine)[/dim]')
 
         if not syzygy_config.enabled:
@@ -71,11 +71,11 @@ class Engine:
         if 'SyzygyPath' in engine.options and 'SyzygyPath' not in engine_config.uci_options:
             delimiter = ';' if os.name == 'nt' else ':'
             await engine.configure({'SyzygyPath': delimiter.join(syzygy_config.paths)})
-            console.print(f'[cyan]SyzygyPath set[/cyan]')
+            cprint(f'[cyan]SyzygyPath set[/cyan]')
 
         if 'SyzygyProbeLimit' in engine.options and 'SyzygyProbeLimit' not in engine_config.uci_options:
             await engine.configure({'SyzygyProbeLimit': syzygy_config.max_pieces})
-            console.print(f'[cyan]SyzygyProbeLimit set to {syzygy_config.max_pieces}[/cyan]')
+            cprint(f'[cyan]SyzygyProbeLimit set to {syzygy_config.max_pieces}[/cyan]')
 
     @property
     def name(self) -> str:
@@ -105,7 +105,7 @@ class Engine:
         result = await self.engine.play(board, limit, info=chess.engine.INFO_ALL, ponder=ponder)
 
         if not result.move:
-            console.print('[bold red]Engine could not make a move![/bold red]')
+            cprint('[bold red]Engine could not make a move![/bold red]')
             raise RuntimeError('Engine could not make a move!')
 
         return result.move, result.info
@@ -123,6 +123,6 @@ class Engine:
         try:
             await asyncio.wait_for(self.engine.quit(), 5.0)
         except TimeoutError:
-            console.print('[red]Engine could not be terminated cleanly.[/red]')
+            cprint('[red]Engine could not be terminated cleanly.[/red]')
 
         self.transport.close()
