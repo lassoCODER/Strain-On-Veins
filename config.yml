@@ -1,5 +1,3 @@
-
-
 token:         # Lichess OAuth2 Token.
 
 engines:
@@ -195,7 +193,7 @@ opening_books:
 
 online_moves:
   opening_explorer:
-    enabled: false                        # Activate online moves from Lichess opening explorer. The move that has performed best for this bot is played.
+    enabled: true                        # Activate online moves from Lichess opening explorer. The move that has performed best for this bot is played.
     priority: 300                         # Priority with which this move source is used. Higher priority is used first.
     only_without_book: false              # Whether the Lichess opening explorer should only be used if there is no matching book.
     use_for_variants: false               # Whether the Lichess opening explorer should be used for other variants than standard and chess960.
@@ -209,7 +207,7 @@ online_moves:
 #   max_depth: 16                         # Half move max depth. (Comment this line for max depth)
 #   max_moves: 1                          # Max number of moves played from Lichess opening explorer. (Comment this line for max moves)
   lichess_cloud:
-    enabled: false                        # Activate online moves from Lichess cloud eval.
+    enabled: true                        # Activate online moves from Lichess cloud eval.
     priority: 200                         # Priority with which this move source is used. Higher priority is used first.
     only_without_book: false              # Whether the cloud should only be used if there is no matching book.
     use_for_variants: true                # Whether the cloud should be used for other variants than standard and chess960.
