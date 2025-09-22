@@ -82,7 +82,7 @@ gaviota:
 
 opening_books:
   enabled: true 
-  priority: 10000
+  priority: 300
   books:
 
     standard_white_rated:
@@ -90,6 +90,8 @@ opening_books:
       allow_repetitions: true
       names:
         - white
+        - DefaultBook
+        - BackupBook
         - Optimus2502
         - Optimus4
 
@@ -98,6 +100,8 @@ opening_books:
       allow_repetitions: true
       names:
         - black
+        - DefaultBook
+        - BackupBook
         - Optimus2502
         - Optimus4
 
@@ -351,6 +355,8 @@ books:                                    # Names of the opening books (to be us
   hordeblack: "./engines/black_horde.bin"
   hordenoob: "./engines/horde.bin"
   hordewhite: "./engines/horde_best.bin"
+  DefaultBook: "./engines/Book2.bin"
+  BackupBook: "./engines/Book3.bin"
 
   
 
