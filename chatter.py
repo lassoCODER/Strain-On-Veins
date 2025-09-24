@@ -216,7 +216,7 @@ class Chatter:
                     f'{getattr(config.offer_draw, "consecutive_moves", 0)} moves.')
 
     def _get_name_message(self, version: str) -> str:
-        return f'I am NNUE_Drift, and I use {self.lichess_game.engine.name} (BotLi {version})'
+        return f'I am {self.username}, and I use {self.lichess_game.engine.name} (BotLi {version})'
 
     def _format_message(self, message: str | None) -> str | None:
         if not message:
