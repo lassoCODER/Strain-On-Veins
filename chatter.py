@@ -105,8 +105,12 @@ class Chatter:
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.lichess_game.engine.name)
             case 'name':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.name_message)
-            case 'ping':
-                await self._handle_ping_command(chat_message)
+            case "ping":
+                if not self.game_info.increment_ms and self.lichess_game.own_time < 10.0:
+                    return
+                    
+                ping = await self.api.ping() * 1000.0
+                await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Ping: {ping:.1f} ms")         
             case 'printeval':
                 if not self.game_info.increment_ms and self.game_info.initial_time_ms < 180_000:
                     await self._send_last_message(chat_message.room)
@@ -128,6 +132,8 @@ class Chatter:
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, message)
             case 'ram':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.ram_message)
+            case "takeback":
+                await self._send_takeback_message(chat_message.room, takeback_count, max_takebacks)
             case 'roast':
                 roast = self._get_random_roast()
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, roast)
@@ -153,27 +159,14 @@ class Chatter:
             last_message = self._append_pv(last_message)
         await self.api.send_chat_message(self.game_info.id_, room, last_message)
 
-    async def _handle_ping_command(self, chat_message: Chat_Message) -> None:
-        ping_ms = await self._get_ping("lichess.org")
-        await self.api.send_chat_message(self.game_info.id_, chat_message.room, f"Ping: {ping_ms}")
-
-    async def _get_ping(self, host: str) -> str:
-        try:
-            count_flag = "-n" if platform.system().lower().startswith("win") else "-c"
-            proc = await asyncio.create_subprocess_exec(
-                "ping", count_flag, "1", host,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+    async def _send_takeback_message(self, room: str, takeback_count: int, max_takebacks: int) -> None:
+        if not max_takebacks:
+            message = f"{self.username} does not accept takebacks."
+        else:
+            message = (
+                f"{self.username} accepts up to {max_takebacks} takeback(s). "
+                f"{self.opponent_username} used {takeback_count} so far."
             )
-            stdout, _ = await proc.communicate()
-            output = stdout.decode()
-
-            match = re.search(r'time[=<] ?(\d+\.?\d*)', output, re.IGNORECASE)
-            if match:
-                return f"{match.group(1)} ms"
-            return "unknown"
-        except Exception as e:
-            return f"error: {e}"
             
     def _get_cpu(self) -> str:
         cpu = ''
