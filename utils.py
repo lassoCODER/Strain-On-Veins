@@ -1,4 +1,5 @@
 from enums import Variant
+from datetime import datetime, timedelta
 
 ALIASES = {
     Variant.STANDARD: ["Standard", "Chess", "Classical", "Normal", "Std"],
@@ -18,6 +19,8 @@ def find_variant(name: str) -> Variant | None:
         if any(name.lower() == alias.lower() for alias in aliases):
             return variant
 
+def get_future_timestamp(seconds: int) -> str:
+    return (datetime.now() + timedelta(seconds=seconds)).isoformat(sep=" ", timespec="seconds")
 
 def parse_time_control(time_control: str) -> tuple[int, int]:
     initial_time_str, increment_str = time_control.split("+")
