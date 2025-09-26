@@ -1,4 +1,3 @@
-
 from asyncio import Task
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field, replace
@@ -22,6 +21,7 @@ class API_Challenge_Reponse:
     invalid_initial: bool = False
     invalid_increment: bool = False
     has_reached_rate_limit: bool = False
+    wait_seconds: int | None = None
     has_timed_out: bool = False
 
 
@@ -122,6 +122,7 @@ class Challenge_Response:
     success: bool = False
     no_opponent: bool = False
     has_reached_rate_limit: bool = False
+    wait_seconds: int | None = None
     is_misconfigured: bool = False
 
 
