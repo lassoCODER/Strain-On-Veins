@@ -10,9 +10,9 @@ engines:
     uci_options:                          # Arbitrary UCI options passed to the engine.
       Threads: 4                          # Max CPU threads the engine can use.
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
-      Move Overhead: 300                  # Increase if your bot flags games too often.
+      Move Overhead: 250                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 3.0                           # Max time per move in seconds.
+      time: 5.0                           # Max time per move in seconds.
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
   variants:                               # Engine used for variants when no suitable special engine is configured.
@@ -197,7 +197,7 @@ opening_books:
 
 online_moves:
   opening_explorer:
-    enabled: true                        # Activate online moves from Lichess opening explorer. The move that has performed best for this bot is played.
+    enabled: false                        # Activate online moves from Lichess opening explorer. The move that has performed best for this bot is played.
     priority: 300                         # Priority with which this move source is used. Higher priority is used first.
     only_without_book: false              # Whether the Lichess opening explorer should only be used if there is no matching book.
     use_for_variants: false               # Whether the Lichess opening explorer should be used for other variants than standard and chess960.
@@ -211,7 +211,7 @@ online_moves:
 #   max_depth: 16                         # Half move max depth. (Comment this line for max depth)
 #   max_moves: 1                          # Max number of moves played from Lichess opening explorer. (Comment this line for max moves)
   lichess_cloud:
-    enabled: true                        # Activate online moves from Lichess cloud eval.
+    enabled: false                        # Activate online moves from Lichess cloud eval.
     priority: 300                         # Priority with which this move source is used. Higher priority is used first.
     only_without_book: false              # Whether the cloud should only be used if there is no matching book.
     use_for_variants: true                # Whether the cloud should be used for other variants than standard and chess960.
@@ -225,14 +225,14 @@ online_moves:
   chessdb:
     enabled: true                        # Activate online moves from https://chessdb.cn/queryc_en/
     priority: 300                         # Priority with which this move source is used. Higher priority is used first.
-    only_without_book: true              # Whether the chessdb should only be used if there is no matching book.
+    only_without_book: false              # Whether the chessdb should only be used if there is no matching book.
     allow_repetitions: false              # Whether the chessdb can create repetitions on the board. Can lead to unintentional draws.
     trust_eval: false                     # Whether the chessdb eval should be trusted for draw offers and resignations.
     min_candidates: 1                     # Minimum number of candidate moves.
     min_time: 10                          # Time the bot must have at least to use the online move. +10 seconds in games without increment.
     timeout: 5                            # Time the server has to respond.
     best_move: true 
-    selection: "good"                     # Move selection is one of "optimal", "best" or "good".
+    selection: "best"                     # Move selection is one of "optimal", "best" or "good".
 #   max_depth: 16                         # Half move max depth. (Comment this line for max depth)
 #   max_moves: 1                          # Max number of moves played from chessdb. (Comment this line for max moves)
   online_egtb:
