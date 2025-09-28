@@ -171,8 +171,10 @@ class API:
                 params={"action": "querypv", "board": fen, "json": 1, "stable": int(best_move)},
                 timeout=aiohttp.ClientTimeout(total=timeout),
             ) as response:
+                json_response = await response.json()
+                print(response.url, response.status, json_response)
                 response.raise_for_status()
-                return await response.json()
+                return json_response
         except (aiohttp.ClientError, json.JSONDecodeError) as e:
             print(f"ChessDB: {e}")
         except TimeoutError:
