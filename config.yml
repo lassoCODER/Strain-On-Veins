@@ -12,7 +12,7 @@ engines:
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
       Move Overhead: 250                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 5.0                           # Max time per move in seconds.
+#      time: 5.0                           # Max time per move in seconds.
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
   variants:                               # Engine used for variants when no suitable special engine is configured.
@@ -28,8 +28,7 @@ engines:
       EvalFile: "3check-cb5f517c228b.nnue:antichess-dd3cbe53cd4e.nnue:atomic-2cf13ff256cc.nnue:crazyhouse-8ebf84784ad2.nnue:horde-28173ddccabe.nnue:kingofthehill-978b86d0e6a4.nnue:racingkings-636b95f085e3.nnue"
       Use NNUE: true
     limits:                               # Limits that end the move calculation early.
-      time: 5.0                           # Max time per move in seconds.
-    
+      time: 5.0                           # Max time per move in seconds.    
 #     depth: 26                           # Max depth per move.
 #     nodes: 4000000                      # Max nodes per move.
 
@@ -44,8 +43,7 @@ engines:
       Hash: 4096                           # Max memory (in megabytes) the engine can allocate.
       Move Overhead: 250                  # Increase if your bot flags games too often.
     limits:                               # Limits that end the move calculation early.
-      time: 3.0                           # Max time per move in seconds.
- 
+      time: 3.0                           # Max time per move in seconds. 
 #      depth: 26                           # Max depth per move.
 #      nodes: 4000000                      # Max nodes per move.
 
@@ -261,7 +259,7 @@ online_moves:
     priority: 250                         # Priority with which this move source is used. Higher priority is used first.
     only_without_book: false              # Whether the cloud should only be used if there is no matching book.
     use_for_variants: false                # Whether the cloud should be used for other variants than standard and chess960.
-    allow_repetitions: false 
+    allow_repetitions: false
     trust_eval: false                     # Whether the cloud eval should be trusted for draw offers and resignations.
     min_eval_depth: 30                    # Minimum evaluation depth.
     min_time: 10                          # Time the bot must have at least to use the online move. +10 seconds in games without increment.
