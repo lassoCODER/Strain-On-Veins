@@ -302,8 +302,8 @@ resign:
 challenge:                                # Incoming challenges.
   concurrency: 2                          # Number of games to play simultaneously.
   max_takebacks: 5                        # Maximum number of takebacks granted to a human.
-  bullet_with_increment_only: false       # Whether bullet games against BOTs should only be accepted with increment.
-# min_increment: 0                        # Minimum amount of increment to accept a challenge.
+  bullet_with_increment_only: true       # Whether bullet games against BOTs should only be accepted with increment.
+  min_increment: 1                        # Minimum amount of increment to accept a challenge.
 # max_increment: 180                      # Maximum amount of increment to accept a challenge.
 # min_initial: 0                          # Minimum amount of initial time to accept a challenge.
 # max_initial: 315360000                  # Maximum amount of initial time to accept a challenge.
