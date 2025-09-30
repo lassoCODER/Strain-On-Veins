@@ -1,26 +1,17 @@
-name: Find Correct Config
+name: Find best config
 
 on:
   workflow_dispatch:
 
 jobs:
-  find-config:
+  find-best:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout target repo
-        uses: actions/checkout@v3
-        with:
-          repository: zonalraid45/Mypant
-          path: target-repo
+      - name: clone realboy’s repo
+        run: git clone --depth 1 https://github.com/zonalraid45/Mypant.git
 
-      - name: Search config for token
+      - name: find the best config (4219–8000)
         run: |
-          MATCH=$(grep -rl 'token: "TokenTimeIsBackBuddyss"' target-repo/Config/ || true)
-          if [ -z "$MATCH" ]; then
-            echo "No correct config file found."
-            exit 1
-          else
-            echo "Correct config file found:"
-            echo "$MATCH"
-          fi
+          cd Mypant/Config
+          sha256sum config{4219..8000}.yml | sort | uniq -u -w64 | awk '{print $2}'

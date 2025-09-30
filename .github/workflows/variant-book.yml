@@ -26,4 +26,4 @@ jobs:
         with:
           name: book-artifacts
           path: |
-            horde.bin
+            anti_white.bin

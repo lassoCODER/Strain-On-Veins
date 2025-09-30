@@ -173,6 +173,8 @@ class API:
             ) as response:
                 json_response = await response.json()
                 print(response.url, response.status, json_response)
+                return json_response
+                print(response.url, response.status, json_response)
                 response.raise_for_status()
                 return json_response
         except (aiohttp.ClientError, json.JSONDecodeError) as e:

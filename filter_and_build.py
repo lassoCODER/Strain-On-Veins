@@ -16,9 +16,9 @@ MAX_PLY = 60
 MAX_BOOK_WEIGHT = 2520
 MIN_RATING = 2400
 
-BOOK_OUTPUT = "horde.bin"
-TOURNAMENT_ID = "CydbQlns"
-ALLOWED_BOTS = {"MaggiChess16", "NecroMindX", "Speedrunchessgames", "Endogenetic-Bot"}
+BOOK_OUTPUT = "anti_white.bin"
+TOURNAMENT_ID = "5sx9Kyda"
+ALLOWED_BOTS = {"NecroMindX", "TacticalBot", "ToromBot", "Exogenetic-Bot"}
 
 
 class BookMove:
@@ -110,7 +110,8 @@ def build_book(bin_path: str):
             winner = chess.BLACK
         else:
             winner = None
-        for ply, move in enumerate(game.mainline_moves()):
+
+        for ply, move in enumerate(mainline_moves):
             if ply >= MAX_PLY:
                 break
             try:
@@ -132,12 +133,18 @@ def build_book(bin_path: str):
         processed += 1
         if processed % 50 == 0:
             print(f"Processed {processed} games")
+
     print(f"Parsed {processed} PGNs, kept {kept} games")
     book.normalize()
     for pos in book.positions.values():
         for bm in pos.moves.values():
             bm.weight = min(MAX_BOOK_WEIGHT, bm.weight + random.randint(0, 2))
     book.save_polyglot(bin_path)
+
+    for pos_key, pos in book.positions.items():
+        for bm in pos.moves.values():
+            if bm.move:
+                print(bm.move.uci(), bm.weight)
 
 
 if __name__ == "__main__":

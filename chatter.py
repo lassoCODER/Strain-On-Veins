@@ -94,6 +94,8 @@ class Chatter:
         text_body = chat_message.text[1:].strip()
         parts = text_body.split(None, 1)
         cmd = parts[0].lower() if parts else ''
+        arg = parts[1].strip() if len(parts) > 1 else None
+
         match cmd:
             case 'cpu':
                 await self.api.send_chat_message(self.game_info.id_, chat_message.room, self.cpu_message)
@@ -318,7 +320,7 @@ class Chatter:
 
     def _get_command_explanation(self, command: str, room: str) -> str:
         explanations = {
-            '!help': 'Shows all available commands which you can use.',
+            '!help': 'Shows all available commands or explains a specific one if given an argument.',
             '!cpu': 'Shows information about the bot\'s CPU (processor, cores, threads, frequency).',
             '!draw': 'Explains the bot\'s draw offering/accepting policy based on evaluation and game length.',
             '!eval': 'Shows the current position evaluation from the chess engine.',
@@ -331,8 +333,7 @@ class Chatter:
             '!roast': 'Sends a roast about your play.',
             '!destroy': 'Sends a roast about your play - deadlier than the roast command.',
             '!quotes': 'Shares an inspirational chess quote from famous players.',
-            '!quiet': 'Stops automatic evaluation printing (use after !printeval).',
-            '!use': 'Tells the use of any command.'
+            '!quiet': 'Stops automatic evaluation printing (use after !printeval).'
         }
 
         if command in explanations and explanations[command] is not None:
