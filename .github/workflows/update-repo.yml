@@ -1,4 +1,4 @@
-name: Sync NNUE
+name: Sync Maggi
 
 on:
   workflow_dispatch:
@@ -23,16 +23,16 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Add NNUE remote
+      - name: Add Maggi remote
         run: |
-          git remote add nnue https://github.com/MaggiCoder16/NNUE_Final.git || echo "NNUE already added"
-          git fetch nnue main
+          git remote add maggi https://github.com/MaggiCoder16/Tasty-MAGGI.git || echo "Maggi Bot already added"
+          git fetch maggi main
 
-      - name: Merge NNUE into our repo
+      - name: Merge Maggi into our repo
         run: |
-          git merge nnue/main --allow-unrelated-histories -X ours --no-edit || true
-          git merge nnue/main -X ours --no-edit || true
-          git commit -am "Sync NNUE updates (ours wins on conflicts)" || echo "No changes to commit"
+          git merge maggi/main --allow-unrelated-histories -X ours --no-edit || true
+          git merge maggi/main -X ours --no-edit || true
+          git commit -am "Sync Maggi updates (ours wins on conflicts)" || echo "No changes to commit"
 
       - name: Push changes
         run: git push origin main
