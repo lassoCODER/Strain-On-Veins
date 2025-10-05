@@ -1,4 +1,4 @@
-name: Sync Maggi
+name: botli ki specific files ko sync karle gavar
 
 on:
   workflow_dispatch:
@@ -23,16 +23,37 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Add Maggi remote
+      - name: Add BotLi remote
         run: |
-          git remote add maggi https://github.com/MaggiCoder16/Tasty-MAGGI.git || echo "Maggi Bot already added"
-          git fetch maggi main
+          git remote add botli https://github.com/Torom/BotLi.git || echo "botli sala remote already exists"
+          git fetch botli main
 
-      - name: Merge Maggi into our repo
+      - name: Sync specific BotLi files sale
         run: |
-          git merge maggi/main --allow-unrelated-histories -X ours --no-edit || true
-          git merge maggi/main -X ours --no-edit || true
-          git commit -am "Sync Maggi updates (ours wins on conflicts)" || echo "No changes to commit"
+          files=(
+            "game.py"
+            "game_manager.py"
+            "lichess_game.py"
+            "api.py"
+            "enums.py"
+            "engine.py"
+            "botli_dataclasses.py"
+            "challenge_validator.py"
+            "challenger.py"
+            "config.py"
+            "configs.py"
+            "matchmaking.py"
+            "user_interface.py"
+            "opponents.py"
+          )
+
+          for f in "${files[@]}"; do
+            echo "Syncing $f"
+            git checkout botli/main -- "$f" || echo "File $f not found in BotLi"
+          done
+
+          git add .
+          git commit -m "Sync BotLi files" || echo "No changes to commit gadhe"
 
       - name: Push changes
         run: git push origin main
